@@ -26,18 +26,21 @@ import {
   TabsList,
   TabsTrigger,
 } from "./ui/tabs";
+import { Link, useParams } from "react-router-dom";
 
 interface GymProfileProps {
-  gymId: string;
-  onBack: () => void;
-  onTrainerClick: (trainerId: string) => void;
+  gymId?: string;
+  onBack?: () => void;
+  onTrainerClick?: (trainerId: string) => void;
 }
 
 export function GymProfile({
-  gymId,
+  gymId: propGymId,
   onBack,
   onTrainerClick,
 }: GymProfileProps) {
+  const { id } = useParams<{ id: string }>();
+  const gymId = propGymId || id;
   const gym = gymsData.find((g) => g.id === gymId);
 
   useEffect(() => {
@@ -49,13 +52,14 @@ export function GymProfile({
       <div className="min-h-screen pt-24 pb-16">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-gray-900 mb-4">Gym Not Found</h2>
-          <Button
-            onClick={onBack}
-            className="bg-orange-600 hover:bg-orange-700"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Gyms
-          </Button>
+          <Link to="/gyms">
+            <Button
+              className="bg-orange-600 hover:bg-orange-700"
+            >
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Gyms
+            </Button>
+          </Link>
         </div>
       </div>
     );
@@ -69,14 +73,15 @@ export function GymProfile({
     <div className="min-h-screen pt-24 pb-16 bg-gray-50">
       <div className="container mx-auto px-4">
         {/* Back Button */}
-        <Button
-          variant="ghost"
-          onClick={onBack}
-          className="mb-6 hover:bg-gray-100"
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Gyms
-        </Button>
+        <Link to="/gyms">
+          <Button
+            variant="ghost"
+            className="mb-6 hover:bg-gray-100"
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Gyms
+          </Button>
+        </Link>
 
         {/* Hero Section */}
         <div className="bg-white rounded-xl shadow-lg overflow-hidden mb-8">
@@ -253,35 +258,35 @@ export function GymProfile({
           <TabsContent value="trainers">
             <div className="grid md:grid-cols-3 gap-6">
               {gymTrainers.map((trainer) => (
-                <Card
-                  key={trainer.id}
-                  className="overflow-hidden hover:shadow-xl transition-shadow cursor-pointer"
-                  onClick={() => onTrainerClick(trainer.id)}
-                >
-                  <div className="aspect-square overflow-hidden">
-                    <ImageWithFallback
-                      src={trainer.image}
-                      alt={trainer.name}
-                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                    />
-                  </div>
-                  <CardContent className="p-6">
-                    <h3 className="text-gray-900 mb-2">
-                      {trainer.name}
-                    </h3>
-                    <Badge variant="secondary" className="mb-3">
-                      {trainer.specialty}
-                    </Badge>
-                    <div className="space-y-2 text-sm text-gray-600">
-                      <div className="flex items-center gap-2">
-                        <Star className="h-4 w-4 text-orange-600 fill-orange-600" />
-                        <span>{trainer.rating} Rating</span>
-                      </div>
-                      <div>{trainer.experience} Experience</div>
-                      <div>{trainer.clients}+ Clients</div>
+                <Link key={trainer.id} to={`/trainers/${trainer.id}`}>
+                  <Card
+                    className="overflow-hidden hover:shadow-xl transition-shadow cursor-pointer h-full"
+                  >
+                    <div className="aspect-square overflow-hidden">
+                      <ImageWithFallback
+                        src={trainer.image}
+                        alt={trainer.name}
+                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                      />
                     </div>
-                  </CardContent>
-                </Card>
+                    <CardContent className="p-6">
+                      <h3 className="text-gray-900 mb-2">
+                        {trainer.name}
+                      </h3>
+                      <Badge variant="secondary" className="mb-3">
+                        {trainer.specialty}
+                      </Badge>
+                      <div className="space-y-2 text-sm text-gray-600">
+                        <div className="flex items-center gap-2">
+                          <Star className="h-4 w-4 text-orange-600 fill-orange-600" />
+                          <span>{trainer.rating} Rating</span>
+                        </div>
+                        <div>{trainer.experience} Experience</div>
+                        <div>{trainer.clients}+ Clients</div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
               ))}
             </div>
           </TabsContent>
@@ -292,11 +297,10 @@ export function GymProfile({
               {gym.membershipOptions.map((option, index) => (
                 <Card
                   key={index}
-                  className={`overflow-hidden ${
-                    index === 1
+                  className={`overflow-hidden ${index === 1
                       ? "border-2 border-orange-600 shadow-xl"
                       : ""
-                  }`}
+                    }`}
                 >
                   {index === 1 && (
                     <div className="bg-orange-600 text-white text-center py-2 text-sm">
@@ -330,11 +334,10 @@ export function GymProfile({
                       )}
                     </ul>
                     <Button
-                      className={`w-full ${
-                        index === 1
+                      className={`w-full ${index === 1
                           ? "bg-orange-600 hover:bg-orange-700"
                           : "bg-gray-900 hover:bg-gray-800"
-                      }`}
+                        }`}
                     >
                       Select Plan
                     </Button>

@@ -4,9 +4,10 @@ import { Card, CardContent } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { Star, MapPin, Users, ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
 
 interface GymsPageProps {
-  onGymClick: (gymId: string) => void;
+  onGymClick?: (gymId: string) => void; // Optional for backward compatibility
 }
 
 export function GymsPage({ onGymClick }: GymsPageProps) {
@@ -26,8 +27,8 @@ export function GymsPage({ onGymClick }: GymsPageProps) {
         {/* Gyms Grid */}
         <div className="grid gap-8 max-w-6xl mx-auto">
           {gymsData.map((gym) => (
-            <Card 
-              key={gym.id} 
+            <Card
+              key={gym.id}
               className="overflow-hidden hover:shadow-2xl transition-all duration-300 border-gray-200"
             >
               <div className="grid md:grid-cols-5 gap-0">
@@ -53,7 +54,7 @@ export function GymsPage({ onGymClick }: GymsPageProps) {
                         {gym.rating}
                       </Badge>
                     </div>
-                    
+
                     <p className="text-gray-600 mb-4 line-clamp-3">
                       {gym.description}
                     </p>
@@ -84,13 +85,14 @@ export function GymsPage({ onGymClick }: GymsPageProps) {
                   </div>
 
                   <div className="flex gap-3">
-                    <Button 
-                      onClick={() => onGymClick(gym.id)}
-                      className="bg-orange-600 hover:bg-orange-700 flex-1"
-                    >
-                      View Details
-                      <ArrowRight className="ml-2 h-4 w-4" />
-                    </Button>
+                    <Link to={`/gyms/${gym.id}`} className="flex-1">
+                      <Button
+                        className="bg-orange-600 hover:bg-orange-700 w-full"
+                      >
+                        View Details
+                        <ArrowRight className="ml-2 h-4 w-4" />
+                      </Button>
+                    </Link>
                     <Button variant="outline">
                       Join Now
                     </Button>
@@ -117,3 +119,4 @@ export function GymsPage({ onGymClick }: GymsPageProps) {
     </div>
   );
 }
+

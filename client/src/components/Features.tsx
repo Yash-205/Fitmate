@@ -34,16 +34,16 @@ const services = [
   },
 ];
 
-export function Services() {
+export function Features() {
   return (
-    <section id="services" className="py-16 md:py-24 bg-white">
+    <section id="features" className="py-16 md:py-24 bg-white">
       <div className="container mx-auto px-4">
         <div className="text-center max-w-3xl mx-auto mb-12">
           <h2 className="text-gray-900 mb-4">
             Everything You Need to Succeed
           </h2>
           <p className="text-gray-600">
-            Our comprehensive approach combines expert coaching, personalized programs, 
+            Our comprehensive approach combines expert coaching, personalized programs,
             and cutting-edge tools to help you achieve your fitness goals.
           </p>
         </div>

@@ -1,4 +1,5 @@
 import { Dumbbell, Facebook, Instagram, Twitter, Youtube } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export function Footer() {
   return (
@@ -6,25 +7,25 @@ export function Footer() {
       <div className="container mx-auto px-4">
         <div className="grid md:grid-cols-4 gap-8 mb-8">
           <div>
-            <div className="flex items-center gap-2 mb-4">
+            <Link to="/" className="flex items-center gap-2 mb-4 hover:opacity-80 transition-opacity">
               <Dumbbell className="h-6 w-6 text-orange-600" />
               <span className="text-white">FitCoach Pro</span>
-            </div>
+            </Link>
             <p className="text-gray-400">
               Transform your body and mind with personalized fitness coaching that delivers real results.
             </p>
           </div>
-          
+
           <div>
             <h3 className="text-white mb-4">Quick Links</h3>
             <ul className="space-y-2">
-              <li><a href="#services" className="hover:text-orange-600 transition-colors">Services</a></li>
-              <li><a href="#programs" className="hover:text-orange-600 transition-colors">Programs</a></li>
-              <li><a href="#trainers" className="hover:text-orange-600 transition-colors">Trainers</a></li>
-              <li><a href="#testimonials" className="hover:text-orange-600 transition-colors">Testimonials</a></li>
+              <li><a href="/#services" className="hover:text-orange-600 transition-colors">Services</a></li>
+              <li><a href="/#programs" className="hover:text-orange-600 transition-colors">Programs</a></li>
+              <li><Link to="/trainers" className="hover:text-orange-600 transition-colors">Trainers</Link></li>
+              <li><a href="/#testimonials" className="hover:text-orange-600 transition-colors">Testimonials</a></li>
             </ul>
           </div>
-          
+
           <div>
             <h3 className="text-white mb-4">Company</h3>
             <ul className="space-y-2">
@@ -34,7 +35,7 @@ export function Footer() {
               <li><a href="#" className="hover:text-orange-600 transition-colors">Contact</a></li>
             </ul>
           </div>
-          
+
           <div>
             <h3 className="text-white mb-4">Connect With Us</h3>
             <div className="flex gap-4">
@@ -53,7 +54,7 @@ export function Footer() {
             </div>
           </div>
         </div>
-        
+
         <div className="border-t border-gray-800 pt-8 text-center text-gray-400">
           <p>&copy; 2025 FitCoach Pro. All rights reserved. | Privacy Policy | Terms of Service</p>
         </div>
@@ -61,3 +62,4 @@ export function Footer() {
     </footer>
   );
 }
+

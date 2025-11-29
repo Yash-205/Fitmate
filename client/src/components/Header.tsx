@@ -2,6 +2,7 @@ import { Dumbbell, Menu, X, User, LogOut } from "lucide-react";
 import { useState } from "react";
 import { Button } from "./ui/button";
 import { useAuth } from "../contexts/AuthContext";
+import { Link, useNavigate } from "react-router-dom";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,57 +15,63 @@ import {
 interface HeaderProps {
   onOpenLogin: () => void;
   onOpenRegister: () => void;
-  onNavigateHome: () => void;
-  onNavigateToTrainers: () => void;
-  onNavigateToGyms: () => void;
+  onNavigateHome?: () => void; // Keeping optional for backward compatibility during refactor
+  onNavigateToTrainers?: () => void;
+  onNavigateToGyms?: () => void;
 }
 
-export function Header({ 
-  onOpenLogin, 
+export function Header({
+  onOpenLogin,
   onOpenRegister,
-  onNavigateHome,
-  onNavigateToTrainers,
-  onNavigateToGyms
 }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+  };
 
   return (
     <header className="fixed top-0 w-full bg-white/95 backdrop-blur-sm z-50 border-b">
       <nav className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
-          <div 
-            className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity"
-            onClick={onNavigateHome}
+          <Link
+            to="/"
+            className="flex items-center gap-2 hover:opacity-80 transition-opacity"
           >
             <Dumbbell className="h-8 w-8 text-orange-600" />
             <span className="text-xl text-gray-900">FitMate</span>
-          </div>
+          </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-8">
-            <button 
-              onClick={onNavigateHome}
+            <Link
+              to="/"
               className="text-gray-700 hover:text-orange-600 transition-colors"
             >
               Home
-            </button>
-            <a href="#programs" className="text-gray-700 hover:text-orange-600 transition-colors">
+            </Link>
+            <Link
+              to="/programs"
+              className="text-gray-700 hover:text-orange-600 transition-colors"
+            >
               Programs
-            </a>
-            <button 
-              onClick={onNavigateToTrainers}
+            </Link>
+            <Link
+              to="/trainers"
               className="text-gray-700 hover:text-orange-600 transition-colors"
             >
               Trainers
-            </button>
-            <button 
-              onClick={onNavigateToGyms}
+            </Link>
+            <Link
+              to="/gyms"
               className="text-gray-700 hover:text-orange-600 transition-colors"
             >
               Gyms
-            </button>
-            
+            </Link>
+
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -76,11 +83,11 @@ export function Header({
                 <DropdownMenuContent align="end">
                   <DropdownMenuLabel>My Account</DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate("/profile")}>
                     <User className="mr-2 h-4 w-4" />
-                    Dashboard
+                    Profile
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={logout}>
+                  <DropdownMenuItem onClick={handleLogout}>
                     <LogOut className="mr-2 h-4 w-4" />
                     Log Out
                   </DropdownMenuItem>
@@ -114,50 +121,51 @@ export function Header({
         {/* Mobile Navigation */}
         {mobileMenuOpen && (
           <div className="md:hidden mt-4 pb-4 flex flex-col gap-4">
-            <button 
-              onClick={() => {
-                onNavigateHome();
-                setMobileMenuOpen(false);
-              }}
+            <Link
+              to="/"
+              onClick={() => setMobileMenuOpen(false)}
               className="text-gray-700 hover:text-orange-600 transition-colors text-left"
             >
               Home
-            </button>
-            <a 
-              href="#programs" 
-              className="text-gray-700 hover:text-orange-600 transition-colors"
+            </Link>
+            <Link
+              to="/programs"
               onClick={() => setMobileMenuOpen(false)}
+              className="text-gray-700 hover:text-orange-600 transition-colors text-left"
             >
               Programs
-            </a>
-            <button 
-              onClick={() => {
-                onNavigateToTrainers();
-                setMobileMenuOpen(false);
-              }}
+            </Link>
+            <Link
+              to="/trainers"
+              onClick={() => setMobileMenuOpen(false)}
               className="text-gray-700 hover:text-orange-600 transition-colors text-left"
             >
               Trainers
-            </button>
-            <button 
-              onClick={() => {
-                onNavigateToGyms();
-                setMobileMenuOpen(false);
-              }}
+            </Link>
+            <Link
+              to="/gyms"
+              onClick={() => setMobileMenuOpen(false)}
               className="text-gray-700 hover:text-orange-600 transition-colors text-left"
             >
               Gyms
-            </button>
-            
+            </Link>
+
             {user ? (
               <>
                 <div className="pt-2 border-t">
                   <p className="text-gray-900 mb-2">Welcome, {user.name}</p>
-                  <Button variant="outline" className="w-full mb-2">
+                  <Button
+                    variant="outline"
+                    className="w-full mb-2"
+                    onClick={() => {
+                      navigate("/profile");
+                      setMobileMenuOpen(false);
+                    }}
+                  >
                     <User className="mr-2 h-4 w-4" />
-                    Dashboard
+                    Profile
                   </Button>
-                  <Button variant="outline" className="w-full" onClick={logout}>
+                  <Button variant="outline" className="w-full" onClick={handleLogout}>
                     <LogOut className="mr-2 h-4 w-4" />
                     Log Out
                   </Button>
@@ -179,3 +187,4 @@ export function Header({
     </header>
   );
 }
+

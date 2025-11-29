@@ -7,17 +7,21 @@ import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { Star, Award, Users, Calendar, MapPin, ArrowLeft, CheckCircle } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
+import { Link, useParams } from "react-router-dom";
 
 interface TrainerProfileProps {
-  trainerId: string;
-  onBack: () => void;
+  trainerId?: string; // Optional now as we can get it from params
+  onBack?: () => void; // Optional for backward compatibility
 }
 
-export function TrainerProfile({ trainerId, onBack }: TrainerProfileProps) {
+export function TrainerProfile({ trainerId: propTrainerId, onBack }: TrainerProfileProps) {
+  const { id } = useParams<{ id: string }>();
+  const trainerId = propTrainerId || id;
   const [trainer, setTrainer] = useState(trainersData.find(t => t.id === trainerId));
 
   useEffect(() => {
     window.scrollTo(0, 0);
+    setTrainer(trainersData.find(t => t.id === trainerId));
   }, [trainerId]);
 
   if (!trainer) {
@@ -25,29 +29,32 @@ export function TrainerProfile({ trainerId, onBack }: TrainerProfileProps) {
       <div className="min-h-screen pt-24 pb-16">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-gray-900 mb-4">Trainer Not Found</h2>
-          <Button onClick={onBack} className="bg-orange-600 hover:bg-orange-700">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Trainers
-          </Button>
+          <Link to="/trainers">
+            <Button className="bg-orange-600 hover:bg-orange-700">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Trainers
+            </Button>
+          </Link>
         </div>
       </div>
     );
   }
 
-  const trainerGyms = gymsData.filter(gym => gym.trainerIds.includes(trainerId));
+  const trainerGyms = gymsData.filter(gym => gym.trainerIds.includes(trainerId || ""));
 
   return (
     <div className="min-h-screen pt-24 pb-16 bg-gray-50">
       <div className="container mx-auto px-4">
         {/* Back Button */}
-        <Button 
-          variant="ghost" 
-          onClick={onBack}
-          className="mb-6 hover:bg-gray-100"
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Trainers
-        </Button>
+        <Link to="/trainers">
+          <Button
+            variant="ghost"
+            className="mb-6 hover:bg-gray-100"
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Trainers
+          </Button>
+        </Link>
 
         {/* Hero Section */}
         <div className="bg-white rounded-xl shadow-lg overflow-hidden mb-8">
@@ -65,7 +72,7 @@ export function TrainerProfile({ trainerId, onBack }: TrainerProfileProps) {
               </Badge>
               <h1 className="text-gray-900 mb-4">{trainer.name}</h1>
               <p className="text-gray-600 mb-6">{trainer.bio}</p>
-              
+
               <div className="grid grid-cols-2 gap-4 mb-6">
                 <div className="flex items-center gap-2">
                   <Star className="h-5 w-5 text-orange-600 fill-orange-600" />
@@ -199,7 +206,7 @@ export function TrainerProfile({ trainerId, onBack }: TrainerProfileProps) {
               <CardContent>
                 <div className="grid md:grid-cols-2 gap-4">
                   {trainer.availability.map((slot, index) => (
-                    <div 
+                    <div
                       key={index}
                       className="flex items-center gap-3 p-4 border rounded-lg hover:border-orange-600 transition-colors"
                     >
@@ -221,27 +228,29 @@ export function TrainerProfile({ trainerId, onBack }: TrainerProfileProps) {
           <TabsContent value="locations">
             <div className="grid md:grid-cols-2 gap-6">
               {trainerGyms.map((gym) => (
-                <Card key={gym.id} className="overflow-hidden hover:shadow-xl transition-shadow">
-                  <div className="aspect-video overflow-hidden">
-                    <ImageWithFallback
-                      src={gym.image}
-                      alt={gym.name}
-                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                    />
-                  </div>
-                  <CardContent className="p-6">
-                    <h3 className="text-gray-900 mb-2">{gym.name}</h3>
-                    <div className="flex items-start gap-2 text-gray-600 mb-4">
-                      <MapPin className="h-4 w-4 flex-shrink-0 mt-1" />
-                      <span>{gym.location}</span>
+                <Link key={gym.id} to={`/gyms/${gym.id}`}>
+                  <Card className="overflow-hidden hover:shadow-xl transition-shadow cursor-pointer h-full">
+                    <div className="aspect-video overflow-hidden">
+                      <ImageWithFallback
+                        src={gym.image}
+                        alt={gym.name}
+                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                      />
                     </div>
-                    <p className="text-sm text-gray-600 mb-4">{gym.description}</p>
-                    <div className="flex items-center gap-2">
-                      <Star className="h-4 w-4 text-orange-600 fill-orange-600" />
-                      <span className="text-sm text-gray-700">{gym.rating} Rating</span>
-                    </div>
-                  </CardContent>
-                </Card>
+                    <CardContent className="p-6">
+                      <h3 className="text-gray-900 mb-2">{gym.name}</h3>
+                      <div className="flex items-start gap-2 text-gray-600 mb-4">
+                        <MapPin className="h-4 w-4 flex-shrink-0 mt-1" />
+                        <span>{gym.location}</span>
+                      </div>
+                      <p className="text-sm text-gray-600 mb-4">{gym.description}</p>
+                      <div className="flex items-center gap-2">
+                        <Star className="h-4 w-4 text-orange-600 fill-orange-600" />
+                        <span className="text-sm text-gray-700">{gym.rating} Rating</span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
               ))}
             </div>
           </TabsContent>
@@ -250,3 +259,4 @@ export function TrainerProfile({ trainerId, onBack }: TrainerProfileProps) {
     </div>
   );
 }
+
