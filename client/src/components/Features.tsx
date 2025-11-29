@@ -1,37 +1,38 @@
-import { Target, Users, Zap, Calendar, TrendingUp, Heart } from "lucide-react";
+import { Target, Users, MessageCircle, Calendar, TrendingUp, Heart } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 
 const services = [
-  {
-    icon: Target,
-    title: "Personalized Plans",
-    description: "Custom workout and nutrition plans designed specifically for your body type, goals, and lifestyle.",
-  },
-  {
-    icon: Users,
-    title: "1-on-1 Coaching",
-    description: "Direct access to certified trainers who guide and motivate you every step of the way.",
-  },
-  {
-    icon: Zap,
-    title: "Quick Results",
-    description: "Our proven methodology delivers visible results in as little as 4 weeks with consistency.",
-  },
-  {
-    icon: Calendar,
-    title: "Flexible Scheduling",
-    description: "Train on your schedule with on-demand workouts and live sessions available 24/7.",
-  },
-  {
-    icon: TrendingUp,
-    title: "Progress Tracking",
-    description: "Advanced analytics and tracking tools to monitor your transformation journey.",
-  },
-  {
-    icon: Heart,
-    title: "Holistic Approach",
-    description: "Focus on fitness, nutrition, mental wellness, and sustainable lifestyle changes.",
-  },
+{
+  icon: Target,
+  title: "Personalized Plans",
+  description: "AI-generated workout and nutrition plans tailored to your goals and lifestyle.",
+},
+{
+  icon: Users,
+  title: "1-on-1 Coaching",
+  description: "Certified trainers offering personalized guidance and accountability.",
+},
+{
+  icon: MessageCircle,
+  title: "AI Fitness Assistant",
+  description: "24/7 AI chat support for quick fitness, diet, and workout solutions.",
+},
+{
+  icon: Calendar,
+  title: "Flexible Scheduling",
+  description: "Daily to-dos, habit reminders, and quick micro workouts on your time.",
+},
+{
+  icon: TrendingUp,
+  title: "Progress Tracking",
+  description: "Monitor habits and milestones with smart, AI-driven insights.",
+},
+{
+  icon: Heart,
+  title: "Holistic Approach",
+  description: "Balanced fitness, nutrition, and mental wellness for long-term results.",
+},
+
 ];
 
 export function Features() {

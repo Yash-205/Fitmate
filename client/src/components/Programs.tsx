@@ -85,7 +85,7 @@ const programs = [
     price: "$199",
     duration: "/month",
     description:
-      "Elite-level coaching focused on speed, power, conditioning & mobility.",
+      "Elite coaching focused on speed, power, conditioning & mobility.",
     features: [
       "Sport-specific training",
       "Unlimited workouts",
@@ -171,7 +171,7 @@ export function Programs() {
                 onMouseEnter={() => setHovered(p.id)}
                 onMouseLeave={() => setHovered(null)}
                 className={`
-    relative cursor-pointer overflow-hidden transition-all duration-200
+    relative cursor-pointer overflow-hidden transition-all duration-500
     ${p.border} shadow-lg
 
     ${isHovered && !isSelected ? "scale-105 shadow-2xl" : ""}

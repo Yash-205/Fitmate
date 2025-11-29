@@ -1,6 +1,6 @@
-import { useState, useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { Button } from "./ui/button";
-import { MessageCircle, X, Send, Sparkles } from "lucide-react";
+import { Send, ArrowLeft, Sparkles, MessageCircle } from "lucide-react";
 import { Card } from "./ui/card";
 import { Input } from "./ui/input";
 import { ScrollArea } from "./ui/scroll-area";
@@ -115,14 +115,12 @@ const FITNESS_RESPONSES: { [key: string]: string[] } = {
   ],
 };
 
-// Track conversation context (using a simple counter for each topic)
 const conversationContext: { [key: string]: number } = {};
 
-function getBotResponse(userMessage: string, messageId: string): string {
+function getBotResponse(userMessage: string): string {
   const message = userMessage.toLowerCase();
   let selectedKeyword = "";
-  
-  // Check for exact matches or partial matches in keywords
+
   for (const [keyword] of Object.entries(FITNESS_RESPONSES)) {
     if (message.includes(keyword)) {
       selectedKeyword = keyword;
@@ -130,17 +128,14 @@ function getBotResponse(userMessage: string, messageId: string): string {
     }
   }
 
-  // If keyword found, rotate through responses using message ID for uniqueness
   if (selectedKeyword && FITNESS_RESPONSES[selectedKeyword]) {
     const responses = FITNESS_RESPONSES[selectedKeyword];
     const currentIndex = conversationContext[selectedKeyword] || 0;
     const response = responses[currentIndex % responses.length];
-    // Increment for next time
     conversationContext[selectedKeyword] = currentIndex + 1;
     return response;
   }
 
-  // Default responses for common questions with variations
   if (message.includes("how") && message.includes("start")) {
     const responses = [
       "Starting your fitness journey is exciting! First, define your goals. Then, start with 3 workouts per week focusing on basic movements. Our Beginner Program provides a perfect structured approach. Would you like to know more?",
@@ -196,7 +191,6 @@ function getBotResponse(userMessage: string, messageId: string): string {
     return responses[index % responses.length];
   }
 
-  // Varied default fallback responses
   const fallbackResponses = [
     "That's a great question! While I can provide general guidance on workouts, nutrition, and our programs, for personalized advice specific to your needs, I recommend booking a consultation with one of our certified trainers. They can create a custom plan just for you!",
     "I'd love to give you more specific guidance on that! For detailed, personalized advice, our certified trainers are available for consultations. They can assess your individual situation and create a customized plan. Interested?",
@@ -204,7 +198,7 @@ function getBotResponse(userMessage: string, messageId: string): string {
     "Good question! I'm here for general guidance, but every person's fitness journey is unique. Our certified trainers can provide personalized recommendations based on your specific needs. Shall I tell you more about our trainers?",
     "I appreciate your question! While I can offer general fitness advice, our certified trainers can give you personalized guidance that's perfect for your specific situation. Would you like to explore our programs?",
   ];
-  
+
   const index = conversationContext["fallback"] || 0;
   conversationContext["fallback"] = index + 1;
   return fallbackResponses[index % fallbackResponses.length];
@@ -219,36 +213,31 @@ const QUICK_QUESTIONS = [
   "Training schedule",
 ];
 
-export function Chatbot() {
+interface ChatbotPageProps {
+  onBack?: () => void;
+}
+
+export function ChatbotPage({ onBack }: ChatbotPageProps) {
   const { messages, addMessage } = useChat();
-  const [isOpen, setIsOpen] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Focus input when chat opens
   useEffect(() => {
-    if (isOpen && inputRef.current) {
-      setTimeout(() => {
-        inputRef.current?.focus();
-      }, 100);
-    }
-  }, [isOpen]);
+    inputRef.current?.focus();
+  }, []);
 
   const handleSendMessage = (messageText?: string) => {
     const textToSend = messageText || inputValue;
     if (!textToSend.trim()) return;
 
-    // Hide suggestions after first message
     setShowSuggestions(false);
 
-    // Add user message
     const userMessage: Message = {
       id: Date.now().toString(),
       text: textToSend,
@@ -259,22 +248,19 @@ export function Chatbot() {
     addMessage(userMessage);
     setInputValue("");
 
-    // Refocus input immediately
     setTimeout(() => {
       inputRef.current?.focus();
     }, 50);
 
-    // Simulate bot response with a slight delay
     setTimeout(() => {
       const botResponse: Message = {
         id: (Date.now() + 1).toString(),
-        text: getBotResponse(textToSend, userMessage.id),
+        text: getBotResponse(textToSend),
         sender: "bot",
         timestamp: new Date(),
       };
       addMessage(botResponse);
-      
-      // Refocus input after bot response
+
       setTimeout(() => {
         inputRef.current?.focus();
       }, 100);
@@ -293,74 +279,74 @@ export function Chatbot() {
   };
 
   return (
-    <>
-      {/* Floating Chat Button */}
-      {!isOpen && (
-        <Button
-          onClick={() => setIsOpen(true)}
-          className="fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full shadow-2xl bg-gradient-to-r from-orange-600 to-purple-600 hover:from-orange-700 hover:to-purple-700 text-white transform hover:scale-110 transition-all animate-pulse"
-          size="icon"
-          title="Chat with FitCoach AI"
-        >
-          <MessageCircle className="h-6 w-6" />
-        </Button>
-      )}
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-purple-50 relative overflow-hidden">
+      {/* Background Elements - matching Programs */}
+      <div className="absolute top-0 right-0 w-96 h-96 bg-orange-200 rounded-full filter blur-3xl opacity-20 animate-pulse"></div>
+      <div className="absolute bottom-0 left-0 w-96 h-96 bg-purple-200 rounded-full filter blur-3xl opacity-20 animate-pulse" style={{ animationDelay: '1s' }}></div>
 
-      {/* Chat Window */}
-      {isOpen && (
-        <Card className="fixed bottom-6 right-6 z-50 w-[380px] h-[500px] shadow-2xl flex flex-col border-2 border-orange-300">
-          {/* Header */}
-          <div className="bg-gradient-to-r from-orange-600 to-purple-600 text-white p-4 flex items-center justify-between flex-shrink-0">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-orange-600 to-purple-600 text-white py-6 sticky top-0 z-50 shadow-2xl relative">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center gap-4">
+            {onBack && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={onBack}
+                className="text-white hover:bg-white/20"
+              >
+                <ArrowLeft className="h-5 w-5" />
+              </Button>
+            )}
             <div className="flex items-center gap-3">
-              <Avatar className="h-10 w-10 bg-white/20 border-2 border-white/30">
+              <Avatar className="h-12 w-12 bg-white/20 border-2 border-white/30">
                 <AvatarFallback className="bg-gradient-to-br from-orange-400 to-purple-500 text-white">
-                  FC
+                  <MessageCircle className="h-6 w-6" />
                 </AvatarFallback>
               </Avatar>
               <div>
-                <h3 className="text-white flex items-center gap-1">
+                <h1 className="text-white text-xl flex items-center gap-2">
                   FitCoach AI
-                  <Sparkles className="h-3 w-3 text-yellow-300" />
-                </h3>
-                <p className="text-xs text-white/90">
-                  Online
-                </p>
+                  <Sparkles className="h-5 w-5 text-yellow-300 animate-pulse" />
+                </h1>
+                <p className="text-sm text-white/90">Your 24/7 Fitness Assistant</p>
               </div>
             </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setIsOpen(false)}
-              className="text-white hover:bg-white/20"
-            >
-              <X className="h-5 w-5" />
-            </Button>
+            <div className="ml-auto">
+              <span className="inline-flex items-center gap-2 px-4 py-2 bg-green-500 rounded-full text-sm shadow-lg">
+                <span className="w-2 h-2 bg-white rounded-full animate-pulse"></span>
+                Always Online
+              </span>
+            </div>
           </div>
+        </div>
+      </div>
 
+      {/* Chat Container */}
+      <div className="container mx-auto px-4 py-8 max-w-5xl relative z-10">
+        <Card className="shadow-2xl border-2 border-orange-200 overflow-hidden backdrop-blur-sm bg-white/95" style={{ height: 'calc(100vh - 250px)' }}>
           {/* Messages Area */}
-          <ScrollArea className="flex-1 overflow-y-auto bg-gradient-to-br from-orange-50/30 via-white to-purple-50/30">
-            <div className="p-4 space-y-4">
+          <ScrollArea className="h-full">
+            <div className="p-6 space-y-6 bg-gradient-to-br from-orange-50/20 via-white to-purple-50/20">
               {messages.map((message) => (
                 <div
                   key={message.id}
                   className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"}`}
                 >
                   <div
-                    className={`max-w-[80%] rounded-2xl p-3 ${
-                      message.sender === "user"
-                        ? "bg-gradient-to-r from-orange-600 to-purple-600 text-white shadow-lg"
+                    className={`max-w-[70%] rounded-2xl p-4 transform hover:scale-102 transition-transform ${message.sender === "user"
+                        ? "bg-gradient-to-r from-orange-600 to-purple-600 text-white shadow-xl"
                         : "bg-white text-gray-900 shadow-md border border-gray-100"
-                    }`}
+                      }`}
                   >
-                    <p className="text-sm whitespace-pre-line">
+                    <p className="text-sm whitespace-pre-line leading-relaxed">
                       {message.text}
                     </p>
                     <span
-                      className={`text-xs mt-1 block ${
-                        message.sender === "user"
+                      className={`text-xs mt-2 block ${message.sender === "user"
                           ? "text-white/90"
                           : "text-gray-500"
-                      }`}
+                        }`}
                     >
                       {message.timestamp.toLocaleTimeString(
                         [],
@@ -373,61 +359,64 @@ export function Chatbot() {
                   </div>
                 </div>
               ))}
-              
-              {/* Quick Question Suggestions */}
+
               {showSuggestions && messages.length === 1 && (
-                <div className="space-y-2 mt-4">
-                  <p className="text-xs text-gray-600 text-center flex items-center justify-center gap-1">
-                    <Sparkles className="h-3 w-3 text-orange-600" />
-                    Quick questions:
-                  </p>
-                  <div className="flex flex-wrap gap-2 justify-center">
+                <div className="space-y-4 mt-8">
+                  <div className="flex items-center justify-center gap-2 mb-4">
+                    <Sparkles className="h-4 w-4 text-orange-600" />
+                    <p className="text-sm text-gray-700">Quick questions to get started:</p>
+                  </div>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                     {QUICK_QUESTIONS.map((question, index) => (
                       <button
                         key={index}
                         onClick={() => handleQuickQuestion(question)}
-                        className="px-3 py-1.5 text-xs bg-gradient-to-r from-orange-100 to-purple-100 border border-orange-200 text-orange-700 rounded-full hover:from-orange-200 hover:to-purple-200 hover:border-orange-400 transition-all shadow-sm hover:shadow-md"
+                        className="px-4 py-3 bg-gradient-to-r from-orange-100 to-purple-100 border-2 border-orange-200 text-orange-700 rounded-xl hover:from-orange-200 hover:to-purple-200 hover:border-orange-400 transition-all shadow-md hover:shadow-lg transform hover:scale-105"
                       >
-                        {question}
+                        <span className="text-sm">{question}</span>
                       </button>
                     ))}
                   </div>
                 </div>
               )}
-              
-              {/* Scroll anchor */}
+
               <div ref={messagesEndRef} />
             </div>
           </ScrollArea>
+        </Card>
 
-          {/* Input Area */}
-          <div className="border-t border-orange-100 p-4 bg-white flex-shrink-0">
-            <div className="flex gap-2">
+        {/* Input Area */}
+        <div className="mt-4">
+          <Card className="p-4 shadow-2xl border-2 border-orange-300 bg-white">
+            <div className="flex gap-3">
               <Input
                 ref={inputRef}
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Type your message..."
-                className="flex-1 border-orange-200 focus:border-orange-400 rounded-xl"
+                placeholder="Ask me anything about workouts, nutrition, programs..."
+                className="flex-1 text-base border-2 border-orange-200 focus:border-orange-500 rounded-xl bg-gradient-to-r from-orange-50/50 to-purple-50/50"
                 autoComplete="off"
               />
               <Button
                 onClick={() => handleSendMessage()}
-                size="icon"
-                className="bg-gradient-to-r from-orange-600 to-purple-600 hover:from-orange-700 hover:to-purple-700 flex-shrink-0 shadow-lg"
+                size="lg"
+                className="bg-gradient-to-r from-orange-600 to-purple-600 hover:from-orange-700 hover:to-purple-700 shadow-xl px-8 transform hover:scale-105 transition-all"
                 disabled={!inputValue.trim()}
               >
-                <Send className="h-4 w-4" />
+                <Send className="h-5 w-5 mr-2" />
+                Send
               </Button>
             </div>
-            <p className="text-xs text-gray-600 mt-2 flex items-center gap-1">
+            <div className="flex items-center justify-center gap-2 mt-3">
               <MessageCircle className="h-3 w-3 text-orange-600" />
-              Ask about workouts, nutrition, or our programs!
-            </p>
-          </div>
-        </Card>
-      )}
-    </>
+              <p className="text-xs text-gray-600">
+                Ask about workouts, nutrition, program recommendations, or anything fitness-related!
+              </p>
+            </div>
+          </Card>
+        </div>
+      </div>
+    </div>
   );
 }

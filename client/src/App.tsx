@@ -1,23 +1,25 @@
 import { useState } from "react";
 import { AuthProvider } from "./contexts/AuthContext";
+import { ChatProvider } from "./contexts/ChatContext";
 import { Header } from "./components/Header";
 import { Footer } from "./components/Footer";
 import { LoginModal } from "./components/LoginModal";
 import { RegisterModal } from "./components/RegisterModal";
 import { Chatbot } from "./components/Chatbot";
 import { Hero } from "./components/Hero";
-import { Programs } from "./components/Programs";
 import { Features } from "./components/Features";
 import { Trainers } from "./components/Trainers";
 import { Testimonials } from "./components/Testimonials";
 import { Gyms } from "./components/Gyms";
 import { TrainersListPage } from "./components/TrainersListPage";
+import { ChatbotSection } from "./components/Chatbotsection";
+import { ChatbotPage } from "./components/ChatbotPage";
 import { TrainerProfile } from "./components/TrainerProfile";
 import { GymsPage } from "./components/GymsPage";
 import { GymProfile } from "./components/GymProfile";
 import { Dashboard } from "./components/Dashboard";
 import { useAuth } from "./contexts/AuthContext";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
 import { Profile } from "./pages/Profile";
 import { ProgramsPage } from "./pages/ProgramsPage";
 
@@ -67,6 +69,7 @@ function Layout({ children }: { children: React.ReactNode }) {
 
 function HomePage() {
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   if (user) {
     return <Dashboard />;
@@ -76,11 +79,17 @@ function HomePage() {
     <>
       <Hero />
       <Features />
+      <ChatbotSection onNavigateToChatbot={() => navigate("/chatbot")} />
       <Trainers />
       <Gyms />
       <Testimonials />
     </>
   );
+}
+
+function ChatbotPageWrapper() {
+  const navigate = useNavigate();
+  return <ChatbotPage onBack={() => navigate("/")} />;
 }
 
 function AppContent() {
@@ -94,6 +103,7 @@ function AppContent() {
         <Route path="/gyms" element={<GymsPage />} />
         <Route path="/trainers/:id" element={<TrainerProfile />} />
         <Route path="/gyms/:id" element={<GymProfile />} />
+        <Route path="/chatbot" element={<ChatbotPageWrapper />} />
       </Routes>
     </Layout>
   );
@@ -103,7 +113,9 @@ export default function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
-        <AppContent />
+        <ChatProvider>
+          <AppContent />
+        </ChatProvider>
       </BrowserRouter>
     </AuthProvider>
   );
