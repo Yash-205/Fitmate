@@ -171,25 +171,36 @@ export function Programs() {
                 onMouseEnter={() => setHovered(p.id)}
                 onMouseLeave={() => setHovered(null)}
                 className={`
-                  relative cursor-pointer overflow-hidden transition-all duration-500
-                  ${p.border} shadow-lg
-                  ${isHovered && !isSelected ? "scale-105 shadow-2xl" : ""}
-                  ${isSelected ? "ring-4 ring-orange-300 scale-105 shadow-2xl" : ""}
-                  ${p.popular && !isSelected ? "md:scale-[1.03] border-orange-400 shadow-xl" : ""}
-                `}
+    relative cursor-pointer overflow-hidden transition-all duration-200
+    ${p.border} shadow-lg
+
+    ${isHovered && !isSelected ? "scale-105 shadow-2xl" : ""}
+    ${isSelected ? "!border-green-500 border-4 scale-105 shadow-2xl" : ""}
+    ${p.popular && isSelected ? "md:scale-[1.03] border-green-400 shadow-xl" : ""}
+    ${p.popular && !isSelected ? "shadow-xl" : ""}
+  `}
               >
+
+
+
+
                 {/* Popular label */}
                 {p.popular && !isSelected && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                    <Badge className="bg-gradient-to-r from-orange-500 to-red-600 shadow-md animate-pulse">
-                      <Star className="h-3 w-3 mr-1" /> Most Popular
-                    </Badge>
+                  <div className="absolute -top-0 left-1/2 -translate-x-1/2 z-[20]">
+                    <div className="bg-white rounded-full">
+                      <Badge className="bg-gradient-to-r from-orange-500 to-red-600 shadow-md animate-pulse">
+                        <Star className="h-3 w-3 mr-1" /> Most Popular
+                      </Badge>
+                    </div>
                   </div>
                 )}
 
+                {/* Selected label ... */}
+
+
                 {/* Selected label */}
                 {isSelected && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                  <div className="absolute -top-0 left-1/2 -translate-x-1/2">
                     <Badge className="bg-gradient-to-r from-green-500 to-emerald-600 shadow-md">
                       <Check className="h-3 w-3 mr-1" /> Selected
                     </Badge>
@@ -204,7 +215,7 @@ export function Programs() {
                 {/* Header */}
                 <div className={`${p.bgSoft} px-6 py-8`}>
                   <div
-                    className={`w-16 h-16 ${p.bgIcon} rounded-2xl mx-auto flex items-center justify-center transition-all duration-300 ${isSelected ? "scale-110 ring-4 ring-orange-200" : "group-hover:scale-110"
+                    className={`w-16 h-16 ${p.bgIcon} rounded-2xl mx-auto flex items-center justify-center transition-all duration-300 ${isSelected ? "scale-110 " : "group-hover:scale-110"
                       }`}
                   >
                     <Icon className={`w-8 h-8 ${p.iconColor}`} />
@@ -334,8 +345,8 @@ export function Programs() {
             ["50+", "Expert Trainers"],
             ["10+", "Years Experience"],
           ].map(([num, label], i) => (
-            <div key={i} className="text-center">
-              <p className="text-3xl font-bold text-orange-600 mb-1">{num}</p>
+            <div key={i} className="text-center bg-white rounded-xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-all text-center">
+              <p className="text-3xl font-bold bg-gradient-to-r from-orange-600 to-purple-600 bg-clip-text text-transparent mb-1">{num}</p>
               <p className="text-sm text-gray-600">{label}</p>
             </div>
           ))}
