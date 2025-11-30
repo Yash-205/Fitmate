@@ -73,26 +73,14 @@ export function Header({
             </Link>
 
             {user ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className="gap-2">
-                    <User className="h-4 w-4" />
-                    {user.name}
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => navigate("/profile")}>
-                    <User className="mr-2 h-4 w-4" />
-                    Profile
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={handleLogout}>
-                    <LogOut className="mr-2 h-4 w-4" />
-                    Log Out
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <Button
+                variant="outline"
+                className="gap-2"
+                onClick={() => navigate("/profile")}
+              >
+                <User className="h-4 w-4" />
+                {user.name}
+              </Button>
             ) : (
               <>
                 <Button variant="outline" onClick={onOpenLogin}>
@@ -151,26 +139,20 @@ export function Header({
             </Link>
 
             {user ? (
-              <>
-                <div className="pt-2 border-t">
-                  <p className="text-gray-900 mb-2">Welcome, {user.name}</p>
-                  <Button
-                    variant="outline"
-                    className="w-full mb-2"
-                    onClick={() => {
-                      navigate("/profile");
-                      setMobileMenuOpen(false);
-                    }}
-                  >
-                    <User className="mr-2 h-4 w-4" />
-                    Profile
-                  </Button>
-                  <Button variant="outline" className="w-full" onClick={handleLogout}>
-                    <LogOut className="mr-2 h-4 w-4" />
-                    Log Out
-                  </Button>
-                </div>
-              </>
+              <div className="pt-2 border-t">
+                <p className="text-gray-900 mb-2">Welcome, {user.name}</p>
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => {
+                    navigate("/profile");
+                    setMobileMenuOpen(false);
+                  }}
+                >
+                  <User className="mr-2 h-4 w-4" />
+                  Profile
+                </Button>
+              </div>
             ) : (
               <>
                 <Button variant="outline" className="w-full" onClick={onOpenLogin}>
@@ -184,7 +166,7 @@ export function Header({
           </div>
         )}
       </nav>
-    </header>
+    </header >
   );
 }
 

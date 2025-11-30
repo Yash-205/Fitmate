@@ -20,7 +20,6 @@ import { GymProfile } from "./components/GymProfile";
 import { Dashboard } from "./components/Dashboard";
 import { useAuth } from "./contexts/AuthContext";
 import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
-import { Profile } from "./pages/Profile";
 import { ProgramsPage } from "./pages/ProgramsPage";
 
 function Layout({ children }: { children: React.ReactNode }) {
@@ -68,16 +67,12 @@ function Layout({ children }: { children: React.ReactNode }) {
 }
 
 function HomePage() {
-  const { user } = useAuth();
   const navigate = useNavigate();
-
-  if (user) {
-    return <Dashboard />;
-  }
 
   return (
     <>
       <Hero />
+      <iframe src="https://drive.google.com/file/d/1syoWRxB-N_Q5StaoEl7beAJot49k3VDl/preview" width="640" height="480" allow="autoplay"></iframe>
       <Features />
       <ChatbotSection onNavigateToChatbot={() => navigate("/chatbot")} />
       <Trainers />
@@ -97,7 +92,7 @@ function AppContent() {
     <Layout>
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="/profile" element={<Profile />} />
+        <Route path="/profile" element={<Dashboard />} />
         <Route path="/programs" element={<ProgramsPage />} />
         <Route path="/trainers" element={<TrainersListPage />} />
         <Route path="/gyms" element={<GymsPage />} />

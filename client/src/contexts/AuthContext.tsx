@@ -1,16 +1,19 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import api from '../services/api';
 
 interface User {
-  id: string;
+  _id: string;
   email: string;
   name: string;
+  role?: string;
+  avatar?: string;
 }
 
 interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => Promise<boolean>;
   register: (email: string, password: string, name: string) => Promise<boolean>;
-  logout: () => void;
+  logout: () => Promise<void>;
   isLoading: boolean;
 }
 
@@ -21,78 +24,60 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check if user is logged in from localStorage
-    const storedUser = localStorage.getItem('fitcoach_user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-    setIsLoading(false);
+    // Check if user is logged in by calling /profile
+    checkAuth();
   }, []);
+
+  const checkAuth = async () => {
+    try {
+      const response = await api.get('/auth/profile');
+      setUser(response.data);
+    } catch (error) {
+      // User not authenticated
+      setUser(null);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const register = async (email: string, password: string, name: string): Promise<boolean> => {
     try {
-      // Get existing users
-      const usersStr = localStorage.getItem('fitcoach_users');
-      const users = usersStr ? JSON.parse(usersStr) : [];
-
-      // Check if user already exists
-      if (users.find((u: any) => u.email === email)) {
-        alert('User with this email already exists');
-        return false;
-      }
-
-      // Create new user
-      const newUser = {
-        id: Date.now().toString(),
+      const response = await api.post('/auth/register', {
         email,
-        password, // In production, never store passwords in plain text!
+        password,
         name,
-      };
-
-      users.push(newUser);
-      localStorage.setItem('fitcoach_users', JSON.stringify(users));
-
-      // Log the user in
-      const userToStore = { id: newUser.id, email: newUser.email, name: newUser.name };
-      setUser(userToStore);
-      localStorage.setItem('fitcoach_user', JSON.stringify(userToStore));
-
+      });
+      setUser(response.data);
       return true;
-    } catch (error) {
-      console.error('Registration error:', error);
+    } catch (error: any) {
+      const message = error.response?.data?.message || 'Registration failed';
+      alert(message);
       return false;
     }
   };
 
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
-      // Get users from localStorage
-      const usersStr = localStorage.getItem('fitcoach_users');
-      const users = usersStr ? JSON.parse(usersStr) : [];
-
-      // Find user
-      const foundUser = users.find((u: any) => u.email === email && u.password === password);
-
-      if (!foundUser) {
-        alert('Invalid email or password');
-        return false;
-      }
-
-      // Set user
-      const userToStore = { id: foundUser.id, email: foundUser.email, name: foundUser.name };
-      setUser(userToStore);
-      localStorage.setItem('fitcoach_user', JSON.stringify(userToStore));
-
+      const response = await api.post('/auth/login', {
+        email,
+        password,
+      });
+      setUser(response.data);
       return true;
-    } catch (error) {
-      console.error('Login error:', error);
+    } catch (error: any) {
+      const message = error.response?.data?.message || 'Login failed';
+      alert(message);
       return false;
     }
   };
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem('fitcoach_user');
+  const logout = async () => {
+    try {
+      await api.post('/auth/logout');
+      setUser(null);
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
   };
 
   return (
