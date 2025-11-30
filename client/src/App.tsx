@@ -72,7 +72,6 @@ function HomePage() {
   return (
     <>
       <Hero />
-      <iframe src="https://drive.google.com/file/d/1syoWRxB-N_Q5StaoEl7beAJot49k3VDl/preview" width="640" height="480" allow="autoplay"></iframe>
       <Features />
       <ChatbotSection onNavigateToChatbot={() => navigate("/chatbot")} />
       <Trainers />
