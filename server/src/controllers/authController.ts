@@ -30,6 +30,7 @@ export const registerUser = async (req: Request, res: Response) => {
                 name: user.name,
                 email: user.email,
                 role: user.role,
+                profileCompleted: user.profileCompleted,
             });
         } else {
             res.status(400).json({ message: 'Invalid user data' });
@@ -59,6 +60,7 @@ export const loginUser = (req: Request, res: Response, next: NextFunction) => {
             email: user.email,
             role: user.role,
             avatar: user.avatar,
+            profileCompleted: user.profileCompleted,
         });
     })(req, res, next);
 };
@@ -80,7 +82,12 @@ export const logoutUser = (req: Request, res: Response) => {
 export const googleCallback = (req: Request, res: Response) => {
     const user = req.user as IUser;
     generateToken(res, (user._id as unknown as string));
-    res.redirect('http://localhost:3000'); // Redirect to frontend
+    if (user.role==null) {
+        res.redirect('http://localhost:3000/role-selection');
+    }
+    else{
+        res.redirect('http://localhost:3000'); // Redirect to frontend
+    }
 };
 
 // @desc    Get user profile
@@ -96,6 +103,7 @@ export const getUserProfile = async (req: Request, res: Response) => {
             email: user.email,
             role: user.role,
             avatar: user.avatar,
+            profileCompleted: user.profileCompleted,
         });
     } else {
         res.status(404).json({ message: 'User not found' });

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import {
   Dialog,
@@ -19,7 +20,8 @@ interface LoginModalProps {
 }
 
 export function LoginModal({ open, onClose, onSwitchToRegister }: LoginModalProps) {
-  const { login } = useAuth();
+  const { login, user } = useAuth();
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -36,6 +38,16 @@ export function LoginModal({ open, onClose, onSwitchToRegister }: LoginModalProp
       setEmail('');
       setPassword('');
       onClose();
+
+      // Redirect based on role status
+      // Wait a bit for user state to update
+      setTimeout(() => {
+        if (user?.role === null || user?.role === undefined) {
+          navigate('/role-selection');
+        } else {
+          navigate('/profile');
+        }
+      }, 100);
     }
   };
 

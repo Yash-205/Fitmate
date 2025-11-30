@@ -1,11 +1,27 @@
 import { useAuth } from '../contexts/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
-import { Activity, Award, Calendar, TrendingUp, Dumbbell, Target } from 'lucide-react';
+import { Activity, Award, Calendar, TrendingUp, Dumbbell, Target, LogOut } from 'lucide-react';
 import { Progress } from './ui/progress';
+import { useNavigate } from 'react-router-dom';
+import { TrainerDashboard } from './TrainerDashboard';
+import { GymOwnerDashboard } from './GymOwnerDashboard';
 
 export function Dashboard() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/');
+  };
+  console.log(user?.role);
+  if (user?.role == 'trainer') {
+    return <TrainerDashboard />;
+  }
+  if (user?.role == 'gymowner') {
+    return <GymOwnerDashboard />;
+  }
 
   const stats = [
     {
@@ -55,11 +71,21 @@ export function Dashboard() {
   return (
     <div className="min-h-screen bg-gray-50 pt-24 pb-16">
       <div className="container mx-auto px-4">
-        <div className="mb-8">
-          <h1 className="text-gray-900 mb-2">Welcome back, {user?.name}! 👋</h1>
-          <p className="text-gray-600">
-            You're making great progress. Keep up the excellent work!
-          </p>
+        <div className="mb-8 flex justify-between items-start">
+          <div>
+            <h1 className="text-gray-900 mb-2">Welcome back, {user?.name}! 👋</h1>
+            <p className="text-gray-600">
+              You're making great progress. Keep up the excellent work!
+            </p>
+          </div>
+          <Button
+            variant="outline"
+            onClick={handleLogout}
+            className="flex items-center gap-2 hover:bg-red-50 hover:text-red-600 hover:border-red-300 transition-colors"
+          >
+            <LogOut className="h-4 w-4" />
+            Logout
+          </Button>
         </div>
 
         {/* Stats Grid */}
@@ -161,3 +187,4 @@ export function Dashboard() {
     </div>
   );
 }
+

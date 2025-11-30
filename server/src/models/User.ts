@@ -7,7 +7,26 @@ export interface IUser extends Document {
     password?: string;
     googleId?: string;
     avatar?: string;
-    role: 'user' | 'admin' | 'trainer';
+    role: 'learner' | 'trainer' | 'gymowner' | 'admin' | null;
+    phone?: string;
+    bio?: string;
+    profileCompleted: boolean;
+
+    // Learner-specific fields
+    fitnessGoals?: string[];
+    experienceLevel?: 'beginner' | 'intermediate' | 'advanced';
+    preferredWorkouts?: string[];
+
+    // Trainer-specific fields
+    certifications?: string[];
+    specializations?: string[];
+    yearsOfExperience?: number;
+
+    // Gym Owner-specific fields
+    gymName?: string;
+    gymLocation?: string;
+    facilities?: string[];
+
     createdAt: Date;
     matchPassword(enteredPassword: string): Promise<boolean>;
 }
@@ -34,9 +53,50 @@ const UserSchema: Schema = new Schema({
     },
     role: {
         type: String,
-        enum: ['user', 'admin', 'trainer'],
-        default: 'user',
+        enum: ['learner', 'trainer', 'gymowner', 'admin', null],
+        default: null,
     },
+    phone: {
+        type: String,
+    },
+    bio: {
+        type: String,
+    },
+    profileCompleted: {
+        type: Boolean,
+        default: false,
+    },
+    // Learner-specific fields
+    fitnessGoals: [{
+        type: String,
+    }],
+    experienceLevel: {
+        type: String,
+        enum: ['beginner', 'intermediate', 'advanced'],
+    },
+    preferredWorkouts: [{
+        type: String,
+    }],
+    // Trainer-specific fields
+    certifications: [{
+        type: String,
+    }],
+    specializations: [{
+        type: String,
+    }],
+    yearsOfExperience: {
+        type: Number,
+    },
+    // Gym Owner-specific fields
+    gymName: {
+        type: String,
+    },
+    gymLocation: {
+        type: String,
+    },
+    facilities: [{
+        type: String,
+    }],
     createdAt: {
         type: Date,
         default: Date.now,

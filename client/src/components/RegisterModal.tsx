@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import {
   Dialog,
@@ -20,6 +21,7 @@ interface RegisterModalProps {
 
 export function RegisterModal({ open, onClose, onSwitchToLogin }: RegisterModalProps) {
   const { register } = useAuth();
+  const navigate = useNavigate();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -51,6 +53,9 @@ export function RegisterModal({ open, onClose, onSwitchToLogin }: RegisterModalP
       setPassword('');
       setConfirmPassword('');
       onClose();
+
+      // New users always need to select a role
+      navigate('/role-selection');
     }
   };
 
