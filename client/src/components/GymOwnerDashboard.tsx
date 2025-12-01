@@ -4,7 +4,10 @@ import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
+import { LogOut } from "lucide-react";
 import { Progress } from "./ui/progress";
+import { useAuth } from "../contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 import { 
   Building2, 
   Users, 
@@ -193,9 +196,16 @@ const mockStats: GymStats = {
 };
 
 export function GymOwnerDashboard() {
+    const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"trainers" | "members">("trainers");
-
+  
+  const handleLogout = async () => {
+    await logout();
+    navigate('/');
+  };
   const filteredTrainers = mockTrainers.filter(trainer =>
     trainer.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     trainer.specialty.toLowerCase().includes(searchQuery.toLowerCase())
@@ -229,6 +239,14 @@ export function GymOwnerDashboard() {
             </h1>
           </div>
           <p className="text-gray-600">Manage your gym, trainers, and members</p>
+          <Button
+            variant="outline"
+            onClick={handleLogout}
+            className="flex items-center gap-2 hover:bg-red-50 hover:text-red-600 hover:border-red-300 transition-colors"
+          >
+            <LogOut className="h-4 w-4" />
+            Logout
+          </Button>
         </div>
 
         {/* Top Stats Grid */}

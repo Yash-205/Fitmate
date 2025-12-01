@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { TrainerDashboard } from './TrainerDashboard';
 import { GymOwnerDashboard } from './GymOwnerDashboard';
 
+
 export function Dashboard() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();

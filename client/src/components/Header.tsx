@@ -2,6 +2,7 @@ import { Dumbbell, Menu, X, User, LogOut } from "lucide-react";
 import { useState } from "react";
 import { Button } from "./ui/button";
 import { useAuth } from "../contexts/AuthContext";
+import { useModal } from "../contexts/ModalContext";
 import { Link, useNavigate } from "react-router-dom";
 import {
   DropdownMenu,
@@ -13,19 +14,15 @@ import {
 } from "./ui/dropdown-menu";
 
 interface HeaderProps {
-  onOpenLogin: () => void;
-  onOpenRegister: () => void;
   onNavigateHome?: () => void; // Keeping optional for backward compatibility during refactor
   onNavigateToTrainers?: () => void;
   onNavigateToGyms?: () => void;
 }
 
-export function Header({
-  onOpenLogin,
-  onOpenRegister,
-}: HeaderProps) {
+export function Header({ }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user, logout } = useAuth();
+  const { openLogin, openRegister } = useModal();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -83,10 +80,10 @@ export function Header({
               </Button>
             ) : (
               <>
-                <Button variant="outline" onClick={onOpenLogin}>
+                <Button variant="outline" onClick={openLogin}>
                   Log In
                 </Button>
-                <Button className="bg-orange-600 hover:bg-orange-700" onClick={onOpenRegister}>
+                <Button className="bg-orange-600 hover:bg-orange-700" onClick={openRegister}>
                   Sign Up
                 </Button>
               </>
@@ -155,10 +152,10 @@ export function Header({
               </div>
             ) : (
               <>
-                <Button variant="outline" className="w-full" onClick={onOpenLogin}>
+                <Button variant="outline" className="w-full" onClick={openLogin}>
                   Log In
                 </Button>
-                <Button className="bg-orange-600 hover:bg-orange-700 w-full" onClick={onOpenRegister}>
+                <Button className="bg-orange-600 hover:bg-orange-700 w-full" onClick={openRegister}>
                   Sign Up
                 </Button>
               </>

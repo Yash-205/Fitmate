@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ChatProvider } from "./contexts/ChatContext";
+import { ModalProvider, useModal } from "./contexts/ModalContext";
 import { Header } from "./components/Header";
 import { Footer } from "./components/Footer";
 import { LoginModal } from "./components/LoginModal";
@@ -25,25 +26,20 @@ import { ProgramsPage } from "./pages/ProgramsPage";
 import { RoleSelection } from "./pages/RoleSelection";
 
 function Layout({ children }: { children: React.ReactNode }) {
-  const [showLogin, setShowLogin] = useState(false);
-  const [showRegister, setShowRegister] = useState(false);
-
-  const handleSwitchToRegister = () => {
-    setShowLogin(false);
-    setShowRegister(true);
-  };
-
-  const handleSwitchToLogin = () => {
-    setShowRegister(false);
-    setShowLogin(true);
-  };
+  const {
+    isLoginOpen,
+    isRegisterOpen,
+    openLogin,
+    openRegister,
+    closeLogin,
+    closeRegister,
+    switchToRegister,
+    switchToLogin
+  } = useModal();
 
   return (
     <div className="min-h-screen bg-white">
-      <Header
-        onOpenLogin={() => setShowLogin(true)}
-        onOpenRegister={() => setShowRegister(true)}
-      />
+      <Header />
 
       <main>
         {children}
@@ -54,15 +50,15 @@ function Layout({ children }: { children: React.ReactNode }) {
       <Chatbot />
 
       <LoginModal
-        open={showLogin}
-        onClose={() => setShowLogin(false)}
-        onSwitchToRegister={handleSwitchToRegister}
+        open={isLoginOpen}
+        onClose={closeLogin}
+        onSwitchToRegister={switchToRegister}
       />
 
       <RegisterModal
-        open={showRegister}
-        onClose={() => setShowRegister(false)}
-        onSwitchToLogin={handleSwitchToLogin}
+        open={isRegisterOpen}
+        onClose={closeRegister}
+        onSwitchToLogin={switchToLogin}
       />
     </div>
   );
@@ -91,7 +87,14 @@ function ChatbotPageWrapper() {
 // Protected route that checks if user has selected a role
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth();
+  const { openLogin } = useModal();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!isLoading && !user) {
+      openLogin();
+    }
+  }, [user, isLoading, openLogin]);
 
   useEffect(() => {
     if (!isLoading && user && (user.role === null || user.role === undefined)) {
@@ -126,7 +129,7 @@ function AppContent() {
         <Route path="/gyms" element={<GymsPage />} />
         <Route path="/trainers/:id" element={<TrainerProfile />} />
         <Route path="/gyms/:id" element={<GymProfile />} />
-        <Route path="/chatbot" element={<ChatbotPageWrapper />} />
+        <Route path="/chatbot" element={<ProtectedRoute><ChatbotPageWrapper /></ProtectedRoute>} />
       </Routes>
     </Layout>
   );
@@ -135,11 +138,13 @@ function AppContent() {
 export default function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
-        <ChatProvider>
-          <AppContent />
-        </ChatProvider>
-      </BrowserRouter>
+      <ModalProvider>
+        <BrowserRouter>
+          <ChatProvider>
+            <AppContent />
+          </ChatProvider>
+        </BrowserRouter>
+      </ModalProvider>
     </AuthProvider>
   );
 }

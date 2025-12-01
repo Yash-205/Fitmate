@@ -1,34 +1,52 @@
 import OpenAI from 'openai';
 
+// Validate API key exists
+if (!process.env.GROQ_API_KEY) {
+    console.error('❌ GROQ_API_KEY is not set in environment variables');
+}
+
 const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
+    apiKey: process.env.GROQ_API_KEY,
+    baseURL: "https://api.groq.com/openai/v1",
 });
 
-export async function getChatResponse(userMessage: string): Promise<string> {
+export async function getChatResponse(userMessage: string, history: { role: 'user' | 'assistant', content: string }[] = []): Promise<string> {
     try {
-        const completion = await openai.chat.completions.create({
-            model: 'gpt-3.5-turbo', // Cheapest model
-            messages: [
-                {
-                    role: 'system',
-                    content: `You are FitCoach AI, a helpful and knowledgeable fitness assistant for FitMate. 
+        console.log('📤 Sending request to GROQ API...');
+
+        const messages = [
+            {
+                role: 'system',
+                content: `You are FitCoach AI, a helpful and knowledgeable fitness assistant for FitMate. 
 You provide advice on workouts, nutrition, training programs, and general fitness questions. 
-Be friendly, encouraging, and provide actionable advice. Keep responses concise but informative.
-When relevant, mention FitMate's programs: Weight Loss ($79/month), Muscle Building ($129/month), 
-and Athletic Performance ($199/month).`,
-                },
-                {
-                    role: 'user',
-                    content: userMessage,
-                },
-            ],
+Be friendly, encouraging, and provide actionable advice. Keep responses concise but informative.`
+            },
+            ...history.map(msg => ({
+                role: msg.role,
+                content: msg.content
+            })),
+            {
+                role: 'user',
+                content: userMessage,
+            },
+        ];
+
+        const completion = await openai.chat.completions.create({
+            model: "llama-3.1-8b-instant",
+            messages: messages as any,
             temperature: 0.7,
-            max_tokens: 300, // Keep responses concise
+            max_tokens: 300,
         });
+        console.log('✅ GROQ API Response received');
 
         return completion.choices[0]?.message?.content || 'Sorry, I could not generate a response.';
-    } catch (error) {
-        console.error('OpenAI API Error:', error);
-        throw new Error('Failed to get response from AI');
+    } catch (error: any) {
+        console.error('❌ GROQ API Error:', {
+            message: error.message,
+            status: error.status,
+            type: error.type,
+            error: error
+        });
+        throw new Error(`Failed to get response from AI: ${error.message}`);
     }
 }

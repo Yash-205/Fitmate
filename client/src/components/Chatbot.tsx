@@ -6,6 +6,7 @@ import { Input } from "./ui/input";
 import { ScrollArea } from "./ui/scroll-area";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 import { useChat, Message } from "../contexts/ChatContext";
+import api from "../services/api";
 
 
 
@@ -19,7 +20,7 @@ const QUICK_QUESTIONS = [
 ];
 
 export function Chatbot() {
-  const { messages, addMessage } = useChat();
+  const { messages, addMessage, currentConversationId, updateConversationId } = useChat();
   const [isOpen, setIsOpen] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(true);
@@ -67,19 +68,21 @@ export function Chatbot() {
 
     try {
       // Call backend API
-      const response = await fetch('http://localhost:3001/api/chat/message', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ message: textToSend }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to get response');
+      const payload: any = { message: textToSend };
+      // For the floating chatbot, we might want to just use the default/last conversation or create new
+      // If we want to share state with the page, we use the same context.
+      if (currentConversationId && !currentConversationId.startsWith("new_")) {
+        payload.conversationId = currentConversationId;
       }
 
-      const data = await response.json();
+      const response = await api.post('/chat/message', payload);
+      const data = response.data;
+
+      if (data.conversationId && (!currentConversationId || currentConversationId.startsWith("new_"))) {
+        updateConversationId(currentConversationId, data.conversationId);
+      }
+
+
 
       // Add bot response
       const botResponse: Message = {
@@ -135,32 +138,27 @@ export function Chatbot() {
 
       {/* Chat Window */}
       {isOpen && (
-        <Card className="fixed bottom-6 right-6 z-50 w-[380px] h-[500px] shadow-2xl flex flex-col border-2 border-orange-300">
+        <Card className="fixed bottom-6 right-6 z-40 w-[380px] max-h-[calc(100vh-100px)] h-[600px] shadow-2xl flex flex-col border-2 border-orange-300">
           {/* Header */}
-          <div className="bg-gradient-to-r from-orange-600 to-purple-600 text-white p-4 flex items-center justify-between flex-shrink-0">
-            <div className="flex items-center gap-3">
-              <Avatar className="h-10 w-10 bg-white/20 border-2 border-white/30">
-                <AvatarFallback className="bg-gradient-to-br from-orange-400 to-purple-500 text-white">
+          <div className="bg-gradient-to-r from-orange-600 to-purple-600 text-white p-2.5 flex items-center justify-between flex-shrink-0">
+            <div className="flex items-center gap-2">
+              <Avatar className="h-8 w-8 bg-white/20 border border-white/30">
+                <AvatarFallback className="bg-gradient-to-br from-orange-400 to-purple-500 text-white text-xs">
                   FC
                 </AvatarFallback>
               </Avatar>
-              <div>
-                <h3 className="text-white flex items-center gap-1">
-                  FitCoach AI
-                  <Sparkles className="h-3 w-3 text-yellow-300" />
-                </h3>
-                <p className="text-xs text-white/90">
-                  Online
-                </p>
-              </div>
+              <h3 className="text-sm font-semibold text-white flex items-center gap-1">
+                FitCoach AI
+                <Sparkles className="h-3 w-3 text-yellow-300" />
+              </h3>
             </div>
             <Button
               variant="ghost"
               size="icon"
               onClick={() => setIsOpen(false)}
-              className="text-white hover:bg-white/20"
+              className="text-white hover:bg-white/20 h-8 w-8"
             >
-              <X className="h-5 w-5" />
+              <X className="h-4 w-4" />
             </Button>
           </div>
 
