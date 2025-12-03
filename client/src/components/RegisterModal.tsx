@@ -140,7 +140,7 @@ export function RegisterModal({ open, onClose, onSwitchToLogin }: RegisterModalP
             type="button"
             variant="outline"
             className="w-full"
-            onClick={() => window.location.href = 'http://localhost:3001/api/auth/google'}
+            onClick={() => window.location.href = 'https://fitmate-yfrz.onrender.com/api/auth/google'}
           >
             <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
               <path
