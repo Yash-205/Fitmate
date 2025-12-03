@@ -13,12 +13,23 @@ const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors({
-    origin: [
-        'http://localhost:5173',
-        'http://localhost:3000',
-        'https://fitmate-blond.vercel.app',
-        process.env.CLIENT_URL || ''
-    ].filter(Boolean),
+    origin: (origin, callback) => {
+        const allowedOrigins = [
+            'http://localhost:5173',
+            'http://localhost:3000',
+            'https://fitmate-blond.vercel.app',
+            process.env.CLIENT_URL || ''
+        ].filter(Boolean);
+
+        // Allow Vercel preview URLs (e.g., https://fitmate-*.vercel.app)
+        const isVercelPreview = origin && /^https:\/\/fitmate-[a-z0-9-]+\.vercel\.app$/.test(origin);
+
+        if (!origin || allowedOrigins.includes(origin) || isVercelPreview) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
     credentials: true,
 }));
 app.use(express.json());
