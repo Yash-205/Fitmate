@@ -19,6 +19,7 @@ export function Dashboard() {
     const fetchDashboardData = async () => {
       try {
         const response = await api.get('/dashboard');
+        console.log('Dashboard API Response:', response.data);
         setDashboardData(response.data);
       } catch (error) {
         console.error('Error fetching dashboard data:', error);

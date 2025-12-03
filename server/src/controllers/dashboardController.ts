@@ -18,12 +18,18 @@ export const getDashboardData = async (req: Request, res: Response) => {
             // Fetch Trainer details
             if (user.trainerId) {
                 const trainer = await User.findById(user.trainerId).select('name email avatar specializations');
+                console.log('Trainer found:', trainer);
                 dashboardData.trainer = trainer;
+            } else {
+                console.log('No trainerId for user');
             }
             // Fetch Gym details
             if (user.gymId) {
                 const gym = await User.findById(user.gymId).select('name email avatar gymName gymLocation facilities');
+                console.log('Gym found:', gym);
                 dashboardData.gym = gym;
+            } else {
+                console.log('No gymId for user');
             }
         } else if (user.role === 'trainer') {
             // Fetch Clients
