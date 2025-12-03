@@ -1,6 +1,4 @@
-import { useEffect } from "react";
-import { gymsData } from "../data/gyms";
-import { trainersData } from "../data/trainers";
+import { useEffect, useState } from "react";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 import {
   Card,
@@ -27,11 +25,26 @@ import {
   TabsTrigger,
 } from "./ui/tabs";
 import { Link, useParams } from "react-router-dom";
+import api from "../services/api";
 
 interface GymProfileProps {
   gymId?: string;
   onBack?: () => void;
   onTrainerClick?: (trainerId: string) => void;
+}
+
+interface Gym {
+  _id: string;
+  gymName: string;
+  gymLocation: string;
+  avatar?: string;
+  facilities?: string[];
+  bio?: string;
+  phone?: string;
+  email?: string;
+  trainers?: any[];
+  members?: any[];
+  memberCount?: number;
 }
 
 export function GymProfile({
@@ -41,11 +54,42 @@ export function GymProfile({
 }: GymProfileProps) {
   const { id } = useParams<{ id: string }>();
   const gymId = propGymId || id;
-  const gym = gymsData.find((g) => g.id === gymId);
+  const [gym, setGym] = useState<Gym | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const fetchGym = async () => {
+      if (!gymId) return;
+
+      try {
+        const response = await api.get(`/gyms/${gymId}`);
+        setGym(response.data as Gym);
+      } catch (error) {
+        console.error('Error fetching gym:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchGym();
     window.scrollTo(0, 0);
   }, [gymId]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen pt-24 pb-16 flex justify-center items-center">
+        Loading gym details...
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen pt-24 pb-16 flex justify-center items-center">
+        Loading gym details...
+      </div>
+    );
+  }
 
   if (!gym) {
     return (
@@ -53,9 +97,7 @@ export function GymProfile({
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-gray-900 mb-4">Gym Not Found</h2>
           <Link to="/gyms">
-            <Button
-              className="bg-orange-600 hover:bg-orange-700"
-            >
+            <Button className="bg-orange-600 hover:bg-orange-700">
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Gyms
             </Button>
@@ -64,10 +106,6 @@ export function GymProfile({
       </div>
     );
   }
-
-  const gymTrainers = trainersData.filter((trainer) =>
-    gym.trainerIds.includes(trainer.id),
-  );
 
   return (
     <div className="min-h-screen pt-24 pb-16 bg-gray-50">
@@ -87,8 +125,8 @@ export function GymProfile({
         <div className="bg-white rounded-xl shadow-lg overflow-hidden mb-8">
           <div className="aspect-video md:aspect-[21/9] overflow-hidden">
             <ImageWithFallback
-              src={gym.image}
-              alt={gym.name}
+              src={gym.avatar || 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800'}
+              alt={gym.gymName}
               className="w-full h-full object-cover"
             />
           </div>
@@ -96,21 +134,19 @@ export function GymProfile({
             <div className="flex flex-wrap items-start justify-between gap-4 mb-6">
               <div>
                 <h1 className="text-gray-900 mb-2">
-                  {gym.name}
+                  {gym.gymName}
                 </h1>
                 <div className="flex items-center gap-4 text-gray-600">
                   <div className="flex items-center gap-2">
                     <MapPin className="h-5 w-5 text-orange-600" />
-                    <span>{gym.location}</span>
+                    <span>{gym.gymLocation}</span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Star className="h-5 w-5 text-orange-600 fill-orange-600" />
-                    <span>{gym.rating} Rating</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Users className="h-5 w-5 text-orange-600" />
-                    <span>{gym.totalMembers} Members</span>
-                  </div>
+                  {gym.memberCount !== undefined && (
+                    <div className="flex items-center gap-2">
+                      <Users className="h-5 w-5 text-orange-600" />
+                      <span>{gym.memberCount} Members</span>
+                    </div>
+                  )}
                 </div>
               </div>
               <Button className="bg-orange-600 hover:bg-orange-700">
@@ -118,21 +154,17 @@ export function GymProfile({
               </Button>
             </div>
             <p className="text-gray-600 text-lg">
-              {gym.description}
+              {gym.bio || 'Premier fitness facility with state-of-the-art equipment and expert trainers.'}
             </p>
           </div>
         </div>
 
         {/* Tabs Section */}
         <Tabs defaultValue="overview" className="w-full">
-          <TabsList className="grid w-full grid-cols-5 mb-8">
+          <TabsList className="grid w-full grid-cols-3 mb-8">
             <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="amenities">
-              Amenities
-            </TabsTrigger>
+            <TabsTrigger value="amenities">Amenities</TabsTrigger>
             <TabsTrigger value="trainers">Trainers</TabsTrigger>
-            <TabsTrigger value="pricing">Pricing</TabsTrigger>
-            <TabsTrigger value="gallery">Gallery</TabsTrigger>
           </TabsList>
 
           {/* Overview Tab */}
@@ -140,93 +172,61 @@ export function GymProfile({
             <div className="grid md:grid-cols-2 gap-6">
               <Card>
                 <CardHeader>
-                  <CardTitle>Hours of Operation</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="flex items-start gap-3">
-                      <Clock className="h-5 w-5 text-orange-600 flex-shrink-0 mt-0.5" />
-                      <div>
-                        <p className="text-gray-900">
-                          Weekdays
-                        </p>
-                        <p className="text-gray-600">
-                          {gym.hours.weekdays}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <Clock className="h-5 w-5 text-orange-600 flex-shrink-0 mt-0.5" />
-                      <div>
-                        <p className="text-gray-900">
-                          Weekends
-                        </p>
-                        <p className="text-gray-600">
-                          {gym.hours.weekends}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
                   <CardTitle>Contact Information</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    <div className="flex items-start gap-3">
-                      <Phone className="h-5 w-5 text-orange-600 flex-shrink-0 mt-0.5" />
-                      <div>
-                        <p className="text-gray-900">Phone</p>
-                        <p className="text-gray-600">
-                          {gym.contact.phone}
-                        </p>
+                    {gym.phone && (
+                      <div className="flex items-start gap-3">
+                        <Phone className="h-5 w-5 text-orange-600 flex-shrink-0 mt-0.5" />
+                        <div>
+                          <p className="text-gray-900">Phone</p>
+                          <p className="text-gray-600">{gym.phone}</p>
+                        </div>
                       </div>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <Mail className="h-5 w-5 text-orange-600 flex-shrink-0 mt-0.5" />
-                      <div>
-                        <p className="text-gray-900">Email</p>
-                        <p className="text-gray-600">
-                          {gym.contact.email}
-                        </p>
+                    )}
+                    {gym.email && (
+                      <div className="flex items-start gap-3">
+                        <Mail className="h-5 w-5 text-orange-600 flex-shrink-0 mt-0.5" />
+                        <div>
+                          <p className="text-gray-900">Email</p>
+                          <p className="text-gray-600">{gym.email}</p>
+                        </div>
                       </div>
-                    </div>
+                    )}
                     <div className="flex items-start gap-3">
                       <MapPin className="h-5 w-5 text-orange-600 flex-shrink-0 mt-0.5" />
                       <div>
-                        <p className="text-gray-900">Address</p>
-                        <p className="text-gray-600">
-                          {gym.contact.address}
-                        </p>
+                        <p className="text-gray-900">Location</p>
+                        <p className="text-gray-600">{gym.gymLocation}</p>
                       </div>
                     </div>
                   </div>
                 </CardContent>
               </Card>
 
-              <Card className="md:col-span-2">
-                <CardHeader>
-                  <CardTitle>Features</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid md:grid-cols-2 gap-3">
-                    {gym.features.map((feature, index) => (
-                      <div
-                        key={index}
-                        className="flex items-start gap-2"
-                      >
-                        <CheckCircle className="h-5 w-5 text-orange-600 flex-shrink-0 mt-0.5" />
-                        <span className="text-gray-700">
-                          {feature}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
+              {gym.facilities && gym.facilities.length > 0 && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Key Features</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid gap-3">
+                      {gym.facilities.slice(0, 6).map((feature, index) => (
+                        <div
+                          key={index}
+                          className="flex items-start gap-2"
+                        >
+                          <CheckCircle className="h-5 w-5 text-orange-600 flex-shrink-0 mt-0.5" />
+                          <span className="text-gray-700">
+                            {feature}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
             </div>
           </TabsContent>
 
@@ -237,132 +237,72 @@ export function GymProfile({
                 <CardTitle>Facility Amenities</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {gym.amenities.map((amenity, index) => (
-                    <div
-                      key={index}
-                      className="flex items-start gap-3 p-4 border rounded-lg hover:border-orange-600 transition-colors"
-                    >
-                      <CheckCircle className="h-5 w-5 text-orange-600 flex-shrink-0 mt-0.5" />
-                      <span className="text-gray-700">
-                        {amenity}
-                      </span>
-                    </div>
-                  ))}
-                </div>
+                {gym.facilities && gym.facilities.length > 0 ? (
+                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {gym.facilities.map((amenity, index) => (
+                      <div
+                        key={index}
+                        className="flex items-start gap-3 p-4 border rounded-lg hover:border-orange-600 transition-colors"
+                      >
+                        <CheckCircle className="h-5 w-5 text-orange-600 flex-shrink-0 mt-0.5" />
+                        <span className="text-gray-700">
+                          {amenity}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-gray-500">No amenities information available.</p>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
 
           {/* Trainers Tab */}
           <TabsContent value="trainers">
-            <div className="grid md:grid-cols-3 gap-6">
-              {gymTrainers.map((trainer) => (
-                <Link key={trainer.id} to={`/trainers/${trainer.id}`}>
-                  <Card
-                    className="overflow-hidden hover:shadow-xl transition-shadow cursor-pointer h-full"
-                  >
-                    <div className="aspect-square overflow-hidden">
-                      <ImageWithFallback
-                        src={trainer.image}
-                        alt={trainer.name}
-                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                      />
-                    </div>
-                    <CardContent className="p-6">
-                      <h3 className="text-gray-900 mb-2">
-                        {trainer.name}
-                      </h3>
-                      <Badge variant="secondary" className="mb-3">
-                        {trainer.specialty}
-                      </Badge>
-                      <div className="space-y-2 text-sm text-gray-600">
-                        <div className="flex items-center gap-2">
-                          <Star className="h-4 w-4 text-orange-600 fill-orange-600" />
-                          <span>{trainer.rating} Rating</span>
-                        </div>
-                        <div>{trainer.experience} Experience</div>
-                        <div>{trainer.clients}+ Clients</div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </Link>
-              ))}
-            </div>
-          </TabsContent>
-
-          {/* Pricing Tab */}
-          <TabsContent value="pricing">
-            <div className="grid md:grid-cols-3 gap-6">
-              {gym.membershipOptions.map((option, index) => (
-                <Card
-                  key={index}
-                  className={`overflow-hidden ${index === 1
-                      ? "border-2 border-orange-600 shadow-xl"
-                      : ""
-                    }`}
-                >
-                  {index === 1 && (
-                    <div className="bg-orange-600 text-white text-center py-2 text-sm">
-                      Most Popular
-                    </div>
-                  )}
-                  <CardHeader>
-                    <CardTitle className="text-center">
-                      {option.name}
-                    </CardTitle>
-                    <div className="text-center">
-                      <span className="text-gray-900 text-3xl">
-                        {option.price}
-                      </span>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <ul className="space-y-3 mb-6">
-                      {option.features.map(
-                        (feature, fIndex) => (
-                          <li
-                            key={fIndex}
-                            className="flex items-start gap-2"
-                          >
-                            <CheckCircle className="h-5 w-5 text-orange-600 flex-shrink-0 mt-0.5" />
-                            <span className="text-gray-700 text-sm">
-                              {feature}
-                            </span>
-                          </li>
-                        ),
-                      )}
-                    </ul>
-                    <Button
-                      className={`w-full ${index === 1
-                          ? "bg-orange-600 hover:bg-orange-700"
-                          : "bg-gray-900 hover:bg-gray-800"
-                        }`}
+            {gym.trainers && gym.trainers.length > 0 ? (
+              <div className="grid md:grid-cols-3 gap-6">
+                {gym.trainers.map((trainer: any) => (
+                  <Link key={trainer._id} to={`/trainers/${trainer._id}`}>
+                    <Card
+                      className="overflow-hidden hover:shadow-xl transition-shadow cursor-pointer h-full"
                     >
-                      Select Plan
-                    </Button>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </TabsContent>
-
-          {/* Gallery Tab */}
-          <TabsContent value="gallery">
-            <div className="grid md:grid-cols-2 gap-6">
-              {gym.gallery.map((image, index) => (
-                <div
-                  key={index}
-                  className="aspect-video overflow-hidden rounded-lg shadow-lg"
-                >
-                  <ImageWithFallback
-                    src={image}
-                    alt={`${gym.name} - Image ${index + 1}`}
-                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                  />
-                </div>
-              ))}
-            </div>
+                      <div className="aspect-square overflow-hidden">
+                        <ImageWithFallback
+                          src={trainer.avatar || 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400'}
+                          alt={trainer.name}
+                          className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                        />
+                      </div>
+                      <CardContent className="p-6">
+                        <h3 className="text-gray-900 mb-2">
+                          {trainer.name}
+                        </h3>
+                        {trainer.specializations && trainer.specializations.length > 0 && (
+                          <Badge variant="secondary" className="mb-3">
+                            {trainer.specializations[0]}
+                          </Badge>
+                        )}
+                        <div className="space-y-2 text-sm text-gray-600">
+                          {trainer.yearsOfExperience && (
+                            <div>{trainer.yearsOfExperience} years experience</div>
+                          )}
+                          {trainer.certifications && (
+                            <div>{trainer.certifications.length} certifications</div>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </Link>
+                ))}
+              </div>
+            ) : (
+              <Card>
+                <CardContent className="p-8 text-center text-gray-500">
+                  No trainers associated with this gym yet.
+                </CardContent>
+              </Card>
+            )}
           </TabsContent>
         </Tabs>
       </div>

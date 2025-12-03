@@ -1,13 +1,46 @@
-import { trainersData } from "../data/trainers";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { Card, CardContent } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { Star, Award, Users, ArrowRight, Zap, TrendingUp, CheckCircle, Calendar } from "lucide-react";
+import api from "../services/api";
+
+interface Trainer {
+  _id: string;
+  name: string;
+  avatar?: string;
+  specializations?: string[];
+  certifications?: string[];
+  yearsOfExperience?: number;
+  bio?: string;
+}
 
 export function TrainersListPage() {
   const navigate = useNavigate();
+  const [trainers, setTrainers] = useState<Trainer[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchTrainers = async () => {
+      try {
+        const response = await api.get('/trainers');
+        setTrainers(response.data as Trainer[]);
+      } catch (error) {
+        console.error('Error fetching trainers:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTrainers();
+  }, []);
+
+  if (loading) {
+    return <div className="min-h-screen pt-24 flex justify-center items-center">Loading trainers...</div>;
+  }
+
   return (
     <div className="min-h-screen pt-24 pb-16 bg-gray-50">
       <div className="container mx-auto px-4">
@@ -39,7 +72,7 @@ export function TrainersListPage() {
             </div>
             <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-lg shadow-sm border border-gray-200">
               <Users className="h-5 w-5 text-orange-600" />
-              <span className="text-sm text-gray-700">820+ Success Stories</span>
+              <span className="text-sm text-gray-700">{trainers.length} Expert Trainers</span>
             </div>
             <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-lg shadow-sm border border-gray-200">
               <Calendar className="h-5 w-5 text-orange-600" />
@@ -50,32 +83,17 @@ export function TrainersListPage() {
 
         {/* Trainers Grid */}
         <div className="grid md:grid-cols-3 gap-8 max-w-7xl mx-auto">
-          {trainersData.map((trainer) => {
-            const isTopRated = trainer.rating === 5.0;
-
+          {trainers.map((trainer) => {
             return (
               <Card
-                key={trainer.id}
-                className={`transition-all duration-300 cursor-pointer group overflow-hidden hover:shadow-xl hover:-translate-y-1 ${isTopRated
-                    ? 'border-orange-300 shadow-lg'
-                    : 'border-gray-200 hover:border-orange-200'
-                  }`}
-                onClick={() => navigate(`/trainers/${trainer.id}`)}
+                key={trainer._id}
+                className="transition-all duration-300 cursor-pointer group overflow-hidden hover:shadow-xl hover:-translate-y-1 border-gray-200 hover:border-orange-200"
+                onClick={() => navigate(`/trainers/${trainer._id}`)}
               >
-                {/* Top Rated Badge */}
-                {isTopRated && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
-                    <Badge className="bg-gradient-to-r from-orange-500 to-purple-600 shadow-lg">
-                      <Star className="h-3 w-3 mr-1 inline fill-white" />
-                      Top Rated
-                    </Badge>
-                  </div>
-                )}
-
                 {/* Image with Overlay */}
                 <div className="aspect-square overflow-hidden relative">
                   <ImageWithFallback
-                    src={trainer.image}
+                    src={trainer.avatar || 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400'}
                     alt={trainer.name}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                   />
@@ -94,65 +112,61 @@ export function TrainersListPage() {
                 <CardContent className="p-6">
                   {/* Name and Specialty */}
                   <h3 className="text-gray-900 mb-2">{trainer.name}</h3>
-                  <Badge
-                    variant="secondary"
-                    className="mb-4"
-                  >
-                    {trainer.specialty}
-                  </Badge>
+                  {trainer.specializations && trainer.specializations.length > 0 && (
+                    <Badge variant="secondary" className="mb-4">
+                      {trainer.specializations[0]}
+                    </Badge>
+                  )}
 
                   {/* Stats Grid */}
                   <div className="space-y-3 mb-5">
-                    <div className="flex items-center gap-3 text-gray-700">
-                      <div className="w-9 h-9 rounded-xl bg-orange-100 flex items-center justify-center flex-shrink-0">
-                        <Star className="h-4 w-4 text-orange-600 fill-orange-600" />
+                    {trainer.yearsOfExperience && (
+                      <div className="flex items-center gap-3 text-gray-700">
+                        <div className="w-9 h-9 rounded-xl bg-orange-100 flex items-center justify-center flex-shrink-0">
+                          <Award className="h-4 w-4 text-orange-600" />
+                        </div>
+                        <div>
+                          <span className="text-sm block">{trainer.yearsOfExperience} years</span>
+                          <span className="text-xs text-gray-500">Experience</span>
+                        </div>
                       </div>
-                      <div>
-                        <span className="text-sm block">{trainer.rating}/5.0</span>
-                        <span className="text-xs text-gray-500">Client Rating</span>
+                    )}
+                    {trainer.certifications && trainer.certifications.length > 0 && (
+                      <div className="flex items-center gap-3 text-gray-700">
+                        <div className="w-9 h-9 rounded-xl bg-orange-100 flex items-center justify-center flex-shrink-0">
+                          <CheckCircle className="h-4 w-4 text-orange-600" />
+                        </div>
+                        <div>
+                          <span className="text-sm block">{trainer.certifications.length} Certifications</span>
+                          <span className="text-xs text-gray-500">Verified</span>
+                        </div>
                       </div>
-                    </div>
-                    <div className="flex items-center gap-3 text-gray-700">
-                      <div className="w-9 h-9 rounded-xl bg-orange-100 flex items-center justify-center flex-shrink-0">
-                        <Award className="h-4 w-4 text-orange-600" />
-                      </div>
-                      <div>
-                        <span className="text-sm block">{trainer.experience}</span>
-                        <span className="text-xs text-gray-500">Experience</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3 text-gray-700">
-                      <div className="w-9 h-9 rounded-xl bg-orange-100 flex items-center justify-center flex-shrink-0">
-                        <Users className="h-4 w-4 text-orange-600" />
-                      </div>
-                      <div>
-                        <span className="text-sm block">{trainer.clients}+</span>
-                        <span className="text-xs text-gray-500">Happy Clients</span>
-                      </div>
-                    </div>
+                    )}
                   </div>
 
                   {/* Specializations Preview */}
-                  <div className="mb-5">
-                    <p className="text-xs text-gray-500 mb-2">Specializations:</p>
-                    <div className="flex flex-wrap gap-1">
-                      {trainer.specializations.slice(0, 3).map((spec, idx) => (
-                        <span
-                          key={idx}
-                          className="px-2 py-1 bg-orange-50 border border-orange-200 rounded-full text-xs text-orange-700"
-                        >
-                          {spec}
-                        </span>
-                      ))}
+                  {trainer.specializations && trainer.specializations.length > 0 && (
+                    <div className="mb-5">
+                      <p className="text-xs text-gray-500 mb-2">Specializations:</p>
+                      <div className="flex flex-wrap gap-1">
+                        {trainer.specializations.slice(0, 3).map((spec, idx) => (
+                          <span
+                            key={idx}
+                            className="px-2 py-1 bg-orange-50 border border-orange-200 rounded-full text-xs text-orange-700"
+                          >
+                            {spec}
+                          </span>
+                        ))}
+                      </div>
                     </div>
-                  </div>
+                  )}
 
                   {/* CTA Button */}
                   <Button
                     className="w-full bg-gradient-to-r from-orange-600 to-purple-600 hover:from-orange-700 hover:to-purple-700 transition-all duration-300"
                     onClick={(e) => {
                       e.stopPropagation();
-                      navigate(`/trainers/${trainer.id}`);
+                      navigate(`/trainers/${trainer._id}`);
                     }}
                   >
                     View Full Profile

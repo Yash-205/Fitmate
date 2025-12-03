@@ -12,8 +12,8 @@ interface User {
 
 interface AuthContextType {
   user: User | null;
-  login: (email: string, password: string) => Promise<boolean>;
-  register: (email: string, password: string, name: string) => Promise<boolean>;
+  login: (email: string, password: string) => Promise<User | null>;
+  register: (email: string, password: string, name: string) => Promise<User | null>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
   isLoading: boolean;
@@ -26,50 +26,56 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check if user is logged in by calling /profile
     checkAuth();
   }, []);
 
   const checkAuth = async () => {
     try {
       const response = await api.get('/auth/profile');
-      setUser(response.data);
-    } catch (error) {
-      // User not authenticated
+      setUser(response.data as User);
+    } catch {
       setUser(null);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const register = async (email: string, password: string, name: string): Promise<boolean> => {
+  const register = async (
+    email: string,
+    password: string,
+    name: string
+  ): Promise<User | null> => {
     try {
       const response = await api.post('/auth/register', {
         email,
         password,
         name,
       });
-      setUser(response.data);
-      return true;
+
+      const userData = response.data as User;
+      setUser(userData);
+      return userData;
+
     } catch (error: any) {
-      const message = error.response?.data?.message || 'Registration failed';
-      alert(message);
-      return false;
+      alert(error.response?.data?.message || 'Registration failed');
+      return null;
     }
   };
 
-  const login = async (email: string, password: string): Promise<boolean> => {
+  const login = async (
+    email: string,
+    password: string
+  ): Promise<User | null> => {
     try {
-      const response = await api.post('/auth/login', {
-        email,
-        password,
-      });
-      setUser(response.data);
-      return true;
+      const response = await api.post('/auth/login', { email, password });
+
+      const userData = response.data as User;
+      setUser(userData);
+      return userData;
+
     } catch (error: any) {
-      const message = error.response?.data?.message || 'Login failed';
-      alert(message);
-      return false;
+      alert(error.response?.data?.message || 'Login failed');
+      return null;
     }
   };
 
@@ -87,7 +93,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, refreshUser, isLoading }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        login,
+        register,
+        logout,
+        refreshUser,
+        isLoading,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
@@ -95,7 +110,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 export function useAuth() {
   const context = useContext(AuthContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;

@@ -1,6 +1,22 @@
 import mongoose, { Document, Schema } from 'mongoose';
 import bcrypt from 'bcryptjs';
 
+interface Review {
+    userId?: string;
+    userName: string;
+    userAvatar?: string;
+    rating: number;
+    comment: string;
+    date: Date;
+}
+
+interface SuccessStory {
+    clientName: string;
+    achievement: string;
+    timeframe: string;
+    image: string;
+}
+
 export interface IUser extends Document {
     name: string;
     email: string;
@@ -12,6 +28,10 @@ export interface IUser extends Document {
     bio?: string;
     profileCompleted: boolean;
 
+    // Common profile fields
+    rating?: number;
+    reviews?: Review[];
+
     // Learner-specific fields
     fitnessGoals?: string[];
     experienceLevel?: 'beginner' | 'intermediate' | 'advanced';
@@ -21,11 +41,22 @@ export interface IUser extends Document {
     certifications?: string[];
     specializations?: string[];
     yearsOfExperience?: number;
+    sessionPrice?: number;
+    availability?: string[];
+    strengths?: string[];
+    successStories?: SuccessStory[];
 
     // Gym Owner-specific fields
     gymName?: string;
     gymLocation?: string;
     facilities?: string[];
+    totalMembers?: number;
+    features?: string[];
+    gallery?: string[];
+
+    // Relationships
+    trainerId?: mongoose.Types.ObjectId;
+    gymId?: mongoose.Types.ObjectId;
 
     createdAt: Date;
     matchPassword(enteredPassword: string): Promise<boolean>;
@@ -66,6 +97,20 @@ const UserSchema: Schema = new Schema({
         type: Boolean,
         default: false,
     },
+    // Common profile fields
+    rating: {
+        type: Number,
+        min: 0,
+        max: 5,
+    },
+    reviews: [{
+        userId: String,
+        userName: { type: String, required: true },
+        userAvatar: String,
+        rating: { type: Number, required: true, min: 0, max: 5 },
+        comment: { type: String, required: true },
+        date: { type: Date, default: Date.now },
+    }],
     // Learner-specific fields
     fitnessGoals: [{
         type: String,
@@ -87,6 +132,21 @@ const UserSchema: Schema = new Schema({
     yearsOfExperience: {
         type: Number,
     },
+    sessionPrice: {
+        type: Number,
+    },
+    availability: [{
+        type: String,
+    }],
+    strengths: [{
+        type: String,
+    }],
+    successStories: [{
+        clientName: { type: String, required: true },
+        achievement: { type: String, required: true },
+        timeframe: { type: String, required: true },
+        image: { type: String, required: true },
+    }],
     // Gym Owner-specific fields
     gymName: {
         type: String,
@@ -97,6 +157,24 @@ const UserSchema: Schema = new Schema({
     facilities: [{
         type: String,
     }],
+    totalMembers: {
+        type: Number,
+    },
+    features: [{
+        type: String,
+    }],
+    gallery: [{
+        type: String,
+    }],
+    // Relationships
+    trainerId: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+    },
+    gymId: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+    },
     createdAt: {
         type: Date,
         default: Date.now,

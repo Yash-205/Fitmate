@@ -76,7 +76,7 @@ export function Chatbot() {
       }
 
       const response = await api.post('/chat/message', payload);
-      const data = response.data;
+      const data = response.data as { conversationId: string; response: string };
 
       if (data.conversationId && (!currentConversationId || currentConversationId.startsWith("new_"))) {
         updateConversationId(currentConversationId, data.conversationId);

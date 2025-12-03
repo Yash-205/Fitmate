@@ -87,17 +87,18 @@ function ChatbotPageWrapper() {
 // Protected route that checks if user has selected a role
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth();
-  const { openLogin } = useModal();
   const navigate = useNavigate();
+  const { openLogin } = useModal();
 
   useEffect(() => {
     if (!isLoading && !user) {
       openLogin();
+      navigate('/');
     }
-  }, [user, isLoading, openLogin]);
+  }, [user, isLoading, navigate, openLogin]);
 
   useEffect(() => {
-    if (!isLoading && user && (user.role === null || user.role === undefined)) {
+    if (!isLoading && user && !user.role) {
       navigate('/role-selection');
     }
   }, [user, isLoading, navigate]);
@@ -106,16 +107,12 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   }
 
-  if (!user) {
-    return <Navigate to="/" replace />;
-  }
-
-  if (user.role === null || user.role === undefined) {
-    return null; // Will redirect in useEffect
-  }
+  if (!user) return null;
+  if (!user.role) return null;
 
   return <>{children}</>;
 }
+
 
 function AppContent() {
   return (

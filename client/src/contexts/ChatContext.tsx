@@ -59,7 +59,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   const fetchConversations = async () => {
     try {
       const response = await api.get('/chat/conversations');
-      const fetchedConversations = response.data;
+      const fetchedConversations = response.data as any[];
 
       if (fetchedConversations.length > 0) {
         // Map backend conversations to frontend format (messages will be fetched on demand or we can fetch latest)
@@ -91,7 +91,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   const fetchMessages = async (conversationId: string) => {
     try {
       const response = await api.get(`/chat/${conversationId}`);
-      const conversationData = response.data;
+      const conversationData = response.data as any;
 
       const mappedMessages: Message[] = conversationData.messages.map((msg: any, index: number) => ({
         id: msg._id || index.toString(),

@@ -77,7 +77,7 @@ export function ChatbotPage({ onBack }: ChatbotPageProps) {
       }
 
       const response = await api.post('/chat/message', payload);
-      const data = response.data;
+      const data = response.data as { conversationId: string; response: string };
 
       // Update conversation ID if it was a new chat
       if (data.conversationId && (!currentConversationId || currentConversationId.startsWith("new_"))) {

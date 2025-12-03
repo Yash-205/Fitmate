@@ -1,27 +1,51 @@
+import { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
-import { Activity, Award, Calendar, TrendingUp, Dumbbell, Target, LogOut } from 'lucide-react';
+import { Activity, Award, Calendar, TrendingUp, Dumbbell, Target, LogOut, User as UserIcon, MapPin } from 'lucide-react';
 import { Progress } from './ui/progress';
 import { useNavigate } from 'react-router-dom';
 import { TrainerDashboard } from './TrainerDashboard';
 import { GymOwnerDashboard } from './GymOwnerDashboard';
-
+import api from '../services/api';
 
 export function Dashboard() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const [dashboardData, setDashboardData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        const response = await api.get('/dashboard');
+        setDashboardData(response.data);
+      } catch (error) {
+        console.error('Error fetching dashboard data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (user) {
+      fetchDashboardData();
+    }
+  }, [user]);
 
   const handleLogout = async () => {
     await logout();
     navigate('/');
   };
-  console.log(user?.role);
-  if (user?.role == 'trainer') {
+
+  if (user?.role === 'trainer') {
     return <TrainerDashboard />;
   }
-  if (user?.role == 'gymowner') {
+  if (user?.role === 'gymowner') {
     return <GymOwnerDashboard />;
+  }
+
+  if (loading) {
+    return <div className="min-h-screen pt-24 flex justify-center">Loading...</div>;
   }
 
   const stats = [
@@ -162,6 +186,93 @@ export function Dashboard() {
               ))}
             </CardContent>
           </Card>
+        </div>
+
+        {/* Trainer and Gym Info */}
+        <div className="grid md:grid-cols-2 gap-6 mt-6">
+          {/* Trainer Info */}
+          {dashboardData?.trainer ? (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <UserIcon className="h-5 w-5 text-orange-600" />
+                  Your Trainer
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="flex items-center gap-4">
+                <div className="w-16 h-16 rounded-full bg-gray-200 overflow-hidden">
+                  {dashboardData.trainer.avatar ? (
+                    <img src={dashboardData.trainer.avatar} alt={dashboardData.trainer.name} className="w-full h-full object-cover" />
+                  ) : (
+                    <UserIcon className="w-full h-full p-3 text-gray-400" />
+                  )}
+                </div>
+                <div>
+                  <h3 className="font-semibold text-lg">{dashboardData.trainer.name}</h3>
+                  <p className="text-gray-600 text-sm">{dashboardData.trainer.email}</p>
+                  {dashboardData.trainer.specializations && (
+                    <div className="flex gap-2 mt-2 flex-wrap">
+                      {dashboardData.trainer.specializations.map((spec: string, i: number) => (
+                        <span key={i} className="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded-full">{spec}</span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          ) : (
+            <Card>
+              <CardHeader>
+                <CardTitle>Find a Trainer</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600 mb-4">You don't have a trainer yet. Connect with a professional to reach your goals faster!</p>
+                <Button onClick={() => navigate('/trainers')}>Browse Trainers</Button>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Gym Info */}
+          {dashboardData?.gym ? (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <MapPin className="h-5 w-5 text-orange-600" />
+                  Your Gym
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="flex items-center gap-4">
+                <div className="w-16 h-16 rounded-lg bg-gray-200 overflow-hidden flex items-center justify-center">
+                  {dashboardData.gym.avatar ? (
+                    <img src={dashboardData.gym.avatar} alt={dashboardData.gym.gymName} className="w-full h-full object-cover" />
+                  ) : (
+                    <Dumbbell className="w-8 h-8 text-gray-400" />
+                  )}
+                </div>
+                <div>
+                  <h3 className="font-semibold text-lg">{dashboardData.gym.gymName}</h3>
+                  <p className="text-gray-600 text-sm">{dashboardData.gym.gymLocation}</p>
+                  {dashboardData.gym.facilities && (
+                    <div className="flex gap-2 mt-2 flex-wrap">
+                      {dashboardData.gym.facilities.slice(0, 3).map((facility: string, i: number) => (
+                        <span key={i} className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full">{facility}</span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          ) : (
+            <Card>
+              <CardHeader>
+                <CardTitle>Find a Gym</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600 mb-4">Join a gym to access premium equipment and facilities.</p>
+                <Button onClick={() => navigate('/gyms')}>Browse Gyms</Button>
+              </CardContent>
+            </Card>
+          )}
         </div>
 
         {/* Quick Actions */}

@@ -1,16 +1,48 @@
-import { gymsData } from "../data/gyms";
+import { useEffect, useState } from "react";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { Card, CardContent } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { Star, MapPin, Users, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import api from "../services/api";
 
 interface GymsPageProps {
   onGymClick?: (gymId: string) => void; // Optional for backward compatibility
 }
 
+interface Gym {
+  _id: string;
+  gymName: string;
+  gymLocation: string;
+  avatar?: string;
+  facilities?: string[];
+  bio?: string;
+}
+
 export function GymsPage({ onGymClick }: GymsPageProps) {
+  const [gyms, setGyms] = useState<Gym[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchGyms = async () => {
+      try {
+        const response = await api.get('/gyms');
+        setGyms(response.data as Gym[]);
+      } catch (error) {
+        console.error('Error fetching gyms:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchGyms();
+  }, []);
+
+  if (loading) {
+    return <div className="min-h-screen pt-24 flex justify-center items-center">Loading gyms...</div>;
+  }
+
   return (
     <div className="min-h-screen pt-24 pb-16 bg-gray-50">
       <div className="container mx-auto px-4">
@@ -26,16 +58,16 @@ export function GymsPage({ onGymClick }: GymsPageProps) {
 
         {/* Gyms Grid */}
         <div className="grid gap-8 max-w-6xl mx-auto">
-          {gymsData.map((gym) => (
+          {gyms.map((gym) => (
             <Card
-              key={gym.id}
+              key={gym._id}
               className="overflow-hidden hover:shadow-2xl transition-all duration-300 border-gray-200"
             >
               <div className="grid md:grid-cols-5 gap-0">
                 <div className="md:col-span-2 aspect-video md:aspect-auto overflow-hidden">
                   <ImageWithFallback
-                    src={gym.image}
-                    alt={gym.name}
+                    src={gym.avatar || 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800'}
+                    alt={gym.gymName}
                     className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
                   />
                 </div>
@@ -43,49 +75,34 @@ export function GymsPage({ onGymClick }: GymsPageProps) {
                   <div>
                     <div className="flex items-start justify-between mb-4">
                       <div>
-                        <h2 className="text-gray-900 mb-2">{gym.name}</h2>
+                        <h2 className="text-gray-900 mb-2">{gym.gymName}</h2>
                         <div className="flex items-center gap-2 text-gray-600 mb-3">
                           <MapPin className="h-4 w-4 text-orange-600" />
-                          <span>{gym.location}</span>
+                          <span>{gym.gymLocation}</span>
                         </div>
                       </div>
-                      <Badge variant="secondary" className="flex items-center gap-1">
-                        <Star className="h-3 w-3 fill-orange-600 text-orange-600" />
-                        {gym.rating}
-                      </Badge>
                     </div>
 
                     <p className="text-gray-600 mb-4 line-clamp-3">
-                      {gym.description}
+                      {gym.bio || 'Premier fitness facility with state-of-the-art equipment and expert trainers.'}
                     </p>
 
                     <div className="flex flex-wrap gap-2 mb-4">
-                      {gym.features.slice(0, 3).map((feature, index) => (
+                      {gym.facilities?.slice(0, 3).map((feature, index) => (
                         <Badge key={index} variant="outline" className="text-xs">
                           {feature}
                         </Badge>
                       ))}
-                      {gym.features.length > 3 && (
+                      {gym.facilities && gym.facilities.length > 3 && (
                         <Badge variant="outline" className="text-xs">
-                          +{gym.features.length - 3} more
+                          +{gym.facilities.length - 3} more
                         </Badge>
                       )}
-                    </div>
-
-                    <div className="flex items-center gap-4 text-sm text-gray-600 mb-6">
-                      <div className="flex items-center gap-2">
-                        <Users className="h-4 w-4 text-orange-600" />
-                        <span>{gym.totalMembers} Members</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Users className="h-4 w-4 text-orange-600" />
-                        <span>{gym.trainerIds.length} Expert Trainers</span>
-                      </div>
                     </div>
                   </div>
 
                   <div className="flex gap-3">
-                    <Link to={`/gyms/${gym.id}`} className="flex-1">
+                    <Link to={`/gyms/${gym._id}`} className="flex-1">
                       <Button
                         className="bg-orange-600 hover:bg-orange-700 w-full"
                       >
