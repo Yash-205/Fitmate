@@ -82,11 +82,12 @@ export const logoutUser = (req: Request, res: Response) => {
 export const googleCallback = (req: Request, res: Response) => {
     const user = req.user as IUser;
     generateToken(res, (user._id as unknown as string));
-    if (user.role==null) {
-        res.redirect('http://localhost:3000/role-selection');
+    const clientUrl = process.env.CLIENT_URL || 'http://localhost:3000';
+    if (user.role == null) {
+        res.redirect(`${clientUrl}/role-selection`);
     }
-    else{
-        res.redirect('http://localhost:3000'); // Redirect to frontend
+    else {
+        res.redirect(clientUrl); // Redirect to frontend
     }
 };
 
