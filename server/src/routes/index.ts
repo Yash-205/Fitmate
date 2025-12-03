@@ -5,6 +5,7 @@ import chatRoutes from './chatRoutes';
 import dashboardRoutes from './dashboardRoutes';
 import gymRoutes from './gymRoutes';
 import trainerRoutes from './trainerRoutes';
+import seedRoutes from './seedRoutes';
 
 const router = Router();
 
@@ -25,6 +26,9 @@ router.use('/gyms', gymRoutes);
 
 // Trainer Routes
 router.use('/trainers', trainerRoutes);
+
+// Seed Routes (for populating database)
+router.use('/', seedRoutes);
 
 // Health check route
 router.get('/health', (req: Request, res: Response) => {
