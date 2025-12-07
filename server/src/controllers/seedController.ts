@@ -3,11 +3,16 @@ import User from '../models/User';
 import { gyms, trainers, learners } from '../data/mockData';
 import mongoose from 'mongoose';
 
+import Workout from '../models/Workout';
+import Goal from '../models/Goal';
+
 export const seedDatabase = async (req: Request, res: Response) => {
     try {
-        // Clear existing users
+        // Clear existing data
         await User.deleteMany({});
-        console.log('Cleared existing users');
+        await Workout.deleteMany({});
+        await Goal.deleteMany({});
+        console.log('Cleared existing data');
 
         // Map to store created user IDs: mockId -> realObjectId
         const idMap: Record<string, mongoose.Types.ObjectId> = {};
@@ -79,6 +84,52 @@ export const seedDatabase = async (req: Request, res: Response) => {
                 gymId: learner.gymId ? idMap[learner.gymId] : undefined,
             });
             createdUsers.push({ role: 'Learner', email: learnerUser.email, password });
+
+            // 4. Create Workouts for Learner
+            const workoutTypes = ['Strength', 'Cardio', 'Yoga', 'HIIT'];
+            const statuses = ['completed', 'completed', 'completed', 'missed', 'scheduled'];
+
+            // Past workouts
+            for (let i = 0; i < 5; i++) {
+                await Workout.create({
+                    userId: learnerUser._id,
+                    trainerId: learnerUser.trainerId,
+                    title: `${workoutTypes[Math.floor(Math.random() * workoutTypes.length)]} Session`,
+                    type: workoutTypes[Math.floor(Math.random() * workoutTypes.length)],
+                    date: new Date(Date.now() - (i + 1) * 24 * 60 * 60 * 1000), // Past dates
+                    duration: [30, 45, 60][Math.floor(Math.random() * 3)],
+                    status: 'completed',
+                    caloriesBurned: Math.floor(Math.random() * 300) + 200,
+                });
+            }
+
+            // Upcoming workouts
+            for (let i = 0; i < 3; i++) {
+                await Workout.create({
+                    userId: learnerUser._id,
+                    trainerId: learnerUser.trainerId,
+                    title: `${workoutTypes[Math.floor(Math.random() * workoutTypes.length)]} Session`,
+                    type: workoutTypes[Math.floor(Math.random() * workoutTypes.length)],
+                    date: new Date(Date.now() + (i + 1) * 24 * 60 * 60 * 1000), // Future dates
+                    duration: [30, 45, 60][Math.floor(Math.random() * 3)],
+                    status: 'scheduled',
+                });
+            }
+
+            // 5. Create Goals for Learner
+            const goalTitles = ['Weight Loss', 'Muscle Gain', 'Running Distance', 'Consistency'];
+            for (let i = 0; i < 2; i++) {
+                const target = Math.floor(Math.random() * 20) + 10;
+                await Goal.create({
+                    userId: learnerUser._id,
+                    title: goalTitles[i],
+                    currentValue: Math.floor(Math.random() * target),
+                    targetValue: target,
+                    unit: i === 0 ? 'kg' : (i === 2 ? 'km' : 'days'),
+                    deadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
+                    status: 'in-progress',
+                });
+            }
         }
 
         console.log('Data Imported Successfully!');

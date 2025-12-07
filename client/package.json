@@ -44,7 +44,7 @@
             "react-hook-form": "^7.55.0",
             "react-resizable-panels": "^2.1.7",
             "react-router-dom": "^7.9.6",
-            "recharts": "^2.15.2",
+            "recharts": "^2.15.4",
             "sonner": "^2.0.3",
             "tailwind-merge": "*",
             "tailwindcss": "^4.1.17",
@@ -54,6 +54,7 @@
             "@types/node": "^20.10.0",
             "@types/react": "^19.2.2",
             "@types/react-dom": "^19.2.2",
+            "@types/recharts": "^1.8.29",
             "@vitejs/plugin-react": "^5.1.1",
             "vite": "6.3.5"
       },

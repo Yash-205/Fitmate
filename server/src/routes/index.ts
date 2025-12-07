@@ -15,8 +15,16 @@ router.use('/auth', authRoutes);
 // Profile Routes
 router.use('/profile', profileRoutes);
 
-// Chat Routes
+// Chat Routes (AI)
 router.use('/chat', chatRoutes);
+
+// Peer Chat Routes (User-to-User)
+import peerChatRoutes from './peerChatRoutes';
+router.use('/peer-chat', peerChatRoutes);
+
+// Workout Routes
+import workoutRoutes from './workoutRoutes';
+router.use('/workouts', workoutRoutes);
 
 // Dashboard Routes
 router.use('/dashboard', dashboardRoutes);

@@ -20,6 +20,7 @@ import { TrainerDashboard } from "./components/TrainerDashboard";
 import { GymsPage } from "./components/GymsPage";
 import { GymProfile } from "./components/GymProfile";
 import { Dashboard } from "./components/Dashboard";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 import { useAuth } from "./contexts/AuthContext";
 import { BrowserRouter, Routes, Route, useNavigate, Navigate } from "react-router-dom";
 import { ProgramsPage } from "./pages/ProgramsPage";
@@ -134,15 +135,18 @@ function AppContent() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <ModalProvider>
-        <BrowserRouter>
-          <ChatProvider>
-            <AppContent />
-          </ChatProvider>
-        </BrowserRouter>
-      </ModalProvider>
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <ModalProvider>
+          <BrowserRouter>
+            <ChatProvider>
+              <AppContent />
+            </ChatProvider>
+          </BrowserRouter>
+        </ModalProvider>
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }
+
 
