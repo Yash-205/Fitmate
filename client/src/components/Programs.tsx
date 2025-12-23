@@ -21,79 +21,53 @@ import {
   Clock,
   Users,
   Star,
+  Mail,
+  Phone,
+  MapPin
 } from "lucide-react";
 
 const programs = [
   {
-    id: "weight-loss",
-    name: "Weight Loss",
-    tagline: "Transform Your Body",
-    price: "$79",
+    id: "basic",
+    name: "FitMate Basic",
+    tagline: "Essential Online Coaching",
+    price: "₹500",
     duration: "/month",
-    description: "Perfect for beginners looking to reduce weight sustainably.",
+    description: "Perfect for those starting their fitness journey with professional guidance.",
     features: [
-      "Custom meal plans",
-      "4 weekly workouts",
-      "Progress tracking",
-      "Email support",
-      "Nutrition guides",
+      "Access to trainer guidance",
+      "Comprehensive dashboard",
+      "Progress tracking & analytics",
+      "24/7 support",
+      "Anytime chat with trainer",
+      "1hr video calls/month",
     ],
     icon: Target,
-    color: "from-green-500 to-emerald-600",
-    bgSoft: "bg-green-50",
-    bgIcon: "bg-green-100",
-    iconColor: "text-green-600",
-    border: "border-green-200 hover:border-green-400",
+    color: "from-blue-500 to-cyan-600",
+    bgSoft: "bg-blue-50",
+    bgIcon: "bg-blue-100",
+    iconColor: "text-blue-600",
+    border: "border-blue-200 hover:border-blue-400",
     stats: [
-      { label: "Avg. Weight Loss", value: "15–25 lbs", icon: TrendingUp },
-      { label: "Program Length", value: "12 weeks", icon: Clock },
+      { label: "Support", value: "24/7 Available", icon: Users },
+      { label: "Best For", value: "Beginners", icon: Star },
     ],
     popular: false,
   },
   {
-    id: "muscle-building",
-    name: "Muscle Building",
-    tagline: "Build Strength & Mass",
-    price: "$129",
+    id: "premium",
+    name: "FitMate Premium",
+    tagline: "Ultimate Fitness Experience",
+    price: "₹1,500",
     duration: "/month",
-    description:
-      "For intermediate to advanced learners wanting structured muscle growth.",
+    description: "For those who want the complete fitness package with gym access.",
     features: [
-      "Advanced workout plans",
-      "6 weekly workouts",
-      "Supplement guidance",
+      "Access to partner gyms",
+      "Dedicated personal trainer",
+      "Unlimited video calls",
       "Priority support",
-      "Video form checks",
-      "Monthly assessments",
-    ],
-    icon: Dumbbell,
-    color: "from-orange-500 to-red-600",
-    bgSoft: "bg-orange-50",
-    bgIcon: "bg-orange-100",
-    iconColor: "text-orange-600",
-    border: "border-orange-200 hover:border-orange-400",
-    stats: [
-      { label: "Avg. Muscle Gain", value: "8–12 lbs", icon: TrendingUp },
-      { label: "Program Length", value: "16 weeks", icon: Clock },
-    ],
-    popular: true,
-  },
-  {
-    id: "athletic-performance",
-    name: "Athletic Performance",
-    tagline: "Reach Peak Performance",
-    price: "$199",
-    duration: "/month",
-    description:
-      "Elite coaching focused on speed, power, conditioning & mobility.",
-    features: [
-      "Sport-specific training",
-      "Unlimited workouts",
-      "1-on-1 video calls",
-      "24/7 trainer access",
-      "Recovery protocols",
-      "Competition prep",
-      "Mobility work",
+      "Custom workout plans",
+      "Nutrition guidance",
     ],
     icon: Trophy,
     color: "from-purple-500 to-indigo-600",
@@ -102,11 +76,38 @@ const programs = [
     iconColor: "text-purple-600",
     border: "border-purple-200 hover:border-purple-400",
     stats: [
-      { label: "Performance Boost", value: "30–40%", icon: Zap },
-      { label: "Program Length", value: "24 weeks", icon: Clock },
+      { label: "Gym Access", value: "Included", icon: Dumbbell },
+      { label: "Best Value", value: "Most Popular", icon: Star },
+    ],
+    popular: true,
+  },
+  {
+    id: "gym-partnership",
+    name: "Gym Partnership",
+    tagline: "Grow Your Fitness Business",
+    price: "₹15,000",
+    duration: "+",
+    description: "Exclusive partnership program for gyms to expand their reach.",
+    features: [
+      "Admin dashboard",
+      "Gym promotion on platform",
+      "Member management tools",
+      "Business analytics",
+      "Profit tracking",
+      "24/7 support",
+    ],
+    icon: Users,
+    color: "from-amber-500 to-orange-600",
+    bgSoft: "bg-amber-50",
+    bgIcon: "bg-amber-100",
+    iconColor: "text-amber-600",
+    border: "border-amber-200 hover:border-amber-400",
+    stats: [
+      { label: "For", value: "Gym Owners", icon: Users },
+      { label: "Potential", value: "High Growth", icon: TrendingUp },
     ],
     popular: false,
-  },
+  }
 ];
 
 export function Programs() {
@@ -122,25 +123,20 @@ export function Programs() {
       id="programs"
       className="py-20 md:py-32 relative overflow-hidden"
     >
-      {/* Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-orange-50 via-white to-purple-50" />
-      <div className="absolute top-0 right-0 w-[450px] h-[450px] bg-orange-300 rounded-full blur-[140px] opacity-30 animate-pulse" />
-      <div
-        className="absolute bottom-0 left-0 w-[450px] h-[450px] bg-purple-300 rounded-full blur-[140px] opacity-30 animate-pulse"
-        style={{ animationDelay: "0.8s" }}
-      />
+      {/* Subtle colored background */}
+      <div className="absolute inset-0 bg-orange-50/30" />
 
       <div className="relative z-10 container mx-auto px-6">
         {/* Header */}
         <div className="text-center max-w-4xl mx-auto mb-20">
-          <div className="inline-flex items-center gap-2 px-5 py-2 bg-gradient-to-r from-orange-100 to-purple-100 rounded-full shadow-sm mb-5">
-            <Zap className="h-4 w-4 text-orange-600" />
-            <span className="text-sm text-gray-800">
+          <div className="inline-flex items-center gap-2 px-5 py-2 bg-white/80 backdrop-blur-sm rounded-full shadow-sm mb-5 border border-orange-100">
+            <Zap className="h-4 w-4 text-orange-500" />
+            <span className="text-sm font-medium text-orange-600">
               Premium Fitness Coaching
             </span>
           </div>
 
-          <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-orange-600 to-purple-700 bg-clip-text text-transparent mb-6">
+          <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-orange-400 to-orange-600 bg-clip-text text-transparent mb-6">
             Choose Your Transformation Journey
           </h2>
 
@@ -188,7 +184,7 @@ export function Programs() {
                 {p.popular && !isSelected && (
                   <div className="absolute -top-0 left-1/2 -translate-x-1/2 z-[20]">
                     <div className="bg-white rounded-full">
-                      <Badge className="bg-gradient-to-r from-orange-500 to-red-600 shadow-md animate-pulse">
+                      <Badge className="bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md animate-pulse">
                         <Star className="h-3 w-3 mr-1" /> Most Popular
                       </Badge>
                     </div>
@@ -346,11 +342,63 @@ export function Programs() {
             ["10+", "Years Experience"],
           ].map(([num, label], i) => (
             <div key={i} className="text-center bg-white rounded-xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-all text-center">
-              <p className="text-3xl font-bold bg-gradient-to-r from-orange-600 to-purple-600 bg-clip-text text-transparent mb-1">{num}</p>
-              <p className="text-sm text-gray-600">{label}</p>
+              <p className="text-3xl font-bold bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent mb-1">{num}</p>
+              <p className="text-sm text-gray-500 font-medium">{label}</p>
             </div>
           ))}
         </div>
+
+        {/* Footer */}
+        <footer className="mt-20 bg-white border-t border-gray-100">
+          <div className="container mx-auto px-6 py-16">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
+              <div className="col-span-1">
+                <h3 className="text-2xl font-bold mb-4 text-gray-800">FitMate</h3>
+                <p className="text-gray-500 text-sm leading-relaxed">
+                  Your personal fitness companion for a healthier, stronger you.
+                </p>
+              </div>
+              <div>
+                <h4 className="font-semibold text-gray-800 mb-4 text-lg">Programs</h4>
+                <ul className="space-y-3">
+                  <li><a href="#" className="text-gray-500 hover:text-orange-500 transition-colors text-sm">Basic Plan</a></li>
+                  <li><a href="#" className="text-gray-500 hover:text-orange-500 transition-colors text-sm">Premium Plan</a></li>
+                  <li><a href="#" className="text-gray-500 hover:text-orange-500 transition-colors text-sm">Gym Partnership</a></li>
+                </ul>
+              </div>
+              <div>
+                <h4 className="font-semibold text-gray-800 mb-4 text-lg">Company</h4>
+                <ul className="space-y-3">
+                  <li><a href="#" className="text-gray-500 hover:text-orange-500 transition-colors text-sm">About Us</a></li>
+                  <li><a href="#" className="text-gray-500 hover:text-orange-500 transition-colors text-sm">Trainers</a></li>
+                  <li><a href="#" className="text-gray-500 hover:text-orange-500 transition-colors text-sm">Testimonials</a></li>
+                </ul>
+              </div>
+              <div>
+                <h4 className="font-semibold text-gray-800 mb-4 text-lg">Contact Us</h4>
+                <ul className="space-y-3 text-gray-500 text-sm">
+                  <li className="flex items-start gap-3">
+                    <Mail className="h-5 w-5 text-orange-500 mt-0.5 flex-shrink-0" />
+                    <span>support@fitmate.com</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <Phone className="h-5 w-5 text-orange-500 mt-0.5 flex-shrink-0" />
+                    <span>+91 98765 43210</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <MapPin className="h-5 w-5 text-orange-500 mt-0.5 flex-shrink-0" />
+                    <span>Mumbai, India</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <div className="border-t border-gray-100 mt-12 pt-8 text-center">
+              <p className="text-sm text-gray-400">
+                © {new Date().getFullYear()} FitMate. All rights reserved.
+              </p>
+            </div>
+          </div>
+        </footer>
       </div>
     </section>
   );

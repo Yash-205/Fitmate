@@ -43,7 +43,10 @@ connectDB();
 app.use('/api', routes);
 
 // Start server
-app.listen(PORT, () => {
+// Start server
+const server = app.listen(PORT, () => {
     console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
+
+export default app;
 
