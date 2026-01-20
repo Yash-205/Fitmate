@@ -1,4 +1,4 @@
-import { Programs } from "../components/Programs";
+import { Programs } from "../components/learner/Programs";
 
 export function ProgramsPage() {
     return (

@@ -31,6 +31,8 @@ export const registerUser = async (req: Request, res: Response) => {
                 email: user.email,
                 role: user.role,
                 profileCompleted: user.profileCompleted,
+                trainerId: user.trainerId,
+                gymId: user.gymId,
             });
         } else {
             res.status(400).json({ message: 'Invalid user data' });
@@ -61,6 +63,8 @@ export const loginUser = (req: Request, res: Response, next: NextFunction) => {
             role: user.role,
             avatar: user.avatar,
             profileCompleted: user.profileCompleted,
+            trainerId: user.trainerId,
+            gymId: user.gymId,
         });
     })(req, res, next);
 };
@@ -105,6 +109,8 @@ export const getUserProfile = async (req: Request, res: Response) => {
             role: user.role,
             avatar: user.avatar,
             profileCompleted: user.profileCompleted,
+            trainerId: user.trainerId,
+            gymId: user.gymId,
         });
     } else {
         res.status(404).json({ message: 'User not found' });

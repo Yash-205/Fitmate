@@ -82,6 +82,15 @@ export const seedDatabase = async (req: Request, res: Response) => {
                 fitnessGoals: learner.goals.map(g => g.title),
                 trainerId: learner.trainerId ? idMap[learner.trainerId] : undefined,
                 gymId: learner.gymId ? idMap[learner.gymId] : undefined,
+                // Add new profile fields with mock data
+                age: 20 + Math.floor(Math.random() * 40), // 20-60
+                gender: Math.random() > 0.5 ? 'male' : 'female',
+                height: 160 + Math.floor(Math.random() * 30), // 160-190 cm
+                weight: 60 + Math.floor(Math.random() * 40), // 60-100 kg
+                targetWeight: 60 + Math.floor(Math.random() * 30),
+                activityLevel: ['sedentary', 'lightly_active', 'moderately_active', 'very_active'][Math.floor(Math.random() * 4)] as any,
+                dietaryPreferences: Math.random() > 0.7 ? ['vegetarian'] : [],
+                injuries: Math.random() > 0.8 ? ['knee_pain'] : [],
             });
             createdUsers.push({ role: 'Learner', email: learnerUser.email, password });
 

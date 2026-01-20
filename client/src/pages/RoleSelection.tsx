@@ -61,6 +61,14 @@ export function RoleSelection() {
         fitnessGoals: [] as string[],
         experienceLevel: 'beginner' as 'beginner' | 'intermediate' | 'advanced',
         preferredWorkouts: [] as string[],
+        age: '',
+        gender: '',
+        height: '',
+        weight: '',
+        targetWeight: '',
+        activityLevel: '',
+        dietaryPreferences: [] as string[],
+        injuries: [] as string[],
         // Trainer fields
         certifications: [] as string[],
         specializations: [] as string[],
@@ -110,6 +118,44 @@ export function RoleSelection() {
         },
     ];
 
+    const FITNESS_GOALS = [
+        "Weight Loss",
+        "Muscle Gain",
+        "Endurance",
+        "Flexibility",
+        "General Fitness",
+        "Strength",
+        "Tone Up",
+        "Stress Reduction"
+    ];
+
+    const DIETARY_PREFERENCES = [
+        "None",
+        "Vegetarian",
+        "Vegan",
+        "Pescatarian",
+        "Keto",
+        "Paleo",
+        "Gluten-Free",
+        "Dairy-Free",
+        "Low Carb",
+        "Halal",
+        "Kosher"
+    ];
+
+    const WORKOUT_TYPES = [
+        "HIIT",
+        "Cardio",
+        "Strength Training",
+        "Yoga",
+        "Pilates",
+        "CrossFit",
+        "Swimming",
+        "Running",
+        "Cycling",
+        "Boxercise"
+    ];
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!selectedRole) {
@@ -130,6 +176,14 @@ export function RoleSelection() {
                 payload.fitnessGoals = formData.fitnessGoals;
                 payload.experienceLevel = formData.experienceLevel;
                 payload.preferredWorkouts = formData.preferredWorkouts;
+                payload.age = formData.age ? Number(formData.age) : undefined;
+                payload.gender = formData.gender;
+                payload.height = formData.height ? Number(formData.height) : undefined;
+                payload.weight = formData.weight ? Number(formData.weight) : undefined;
+                payload.targetWeight = formData.targetWeight ? Number(formData.targetWeight) : undefined;
+                payload.activityLevel = formData.activityLevel;
+                payload.dietaryPreferences = formData.dietaryPreferences;
+                payload.injuries = formData.injuries;
             } else if (selectedRole === 'trainer') {
                 payload.certifications = formData.certifications;
                 payload.specializations = formData.specializations;
@@ -154,6 +208,16 @@ export function RoleSelection() {
     const handleArrayInput = (field: string, value: string) => {
         const items = value.split(',').map(item => item.trim()).filter(item => item);
         setFormData({ ...formData, [field]: items });
+    };
+
+    const toggleSelection = (field: 'fitnessGoals' | 'dietaryPreferences' | 'preferredWorkouts', value: string) => {
+        setFormData(prev => {
+            const current = prev[field];
+            const updated = current.includes(value)
+                ? current.filter(item => item !== value)
+                : [...current, value];
+            return { ...prev, [field]: updated };
+        });
     };
 
     return (
@@ -221,16 +285,125 @@ export function RoleSelection() {
                                 {/* Learner-specific Fields */}
                                 {selectedRole === 'learner' && (
                                     <>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">Age</label>
+                                                <input
+                                                    type="number"
+                                                    value={formData.age}
+                                                    onChange={(e) => setFormData({ ...formData, age: e.target.value })}
+                                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-600 focus:border-transparent"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">Gender</label>
+                                                <select
+                                                    value={formData.gender}
+                                                    onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
+                                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-600 focus:border-transparent"
+                                                >
+                                                    <option value="">Select Gender</option>
+                                                    <option value="male">Male</option>
+                                                    <option value="female">Female</option>
+                                                    <option value="other">Other</option>
+                                                    <option value="prefer_not_to_say">Prefer not to say</option>
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">Height (cm)</label>
+                                                <input
+                                                    type="number"
+                                                    value={formData.height}
+                                                    onChange={(e) => setFormData({ ...formData, height: e.target.value })}
+                                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-600 focus:border-transparent"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">Weight (kg)</label>
+                                                <input
+                                                    type="number"
+                                                    value={formData.weight}
+                                                    onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
+                                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-600 focus:border-transparent"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">Target Weight (kg)</label>
+                                                <input
+                                                    type="number"
+                                                    value={formData.targetWeight}
+                                                    onChange={(e) => setFormData({ ...formData, targetWeight: e.target.value })}
+                                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-600 focus:border-transparent"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">Activity Level</label>
+                                                <select
+                                                    value={formData.activityLevel}
+                                                    onChange={(e) => setFormData({ ...formData, activityLevel: e.target.value })}
+                                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-600 focus:border-transparent"
+                                                >
+                                                    <option value="">Select Level</option>
+                                                    <option value="sedentary">Sedentary</option>
+                                                    <option value="lightly_active">Lightly Active</option>
+                                                    <option value="moderately_active">Moderately Active</option>
+                                                    <option value="very_active">Very Active</option>
+                                                    <option value="extra_active">Extra Active</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                Fitness Goals (comma-separated)
+                                                Fitness Goals
+                                            </label>
+                                            <div className="flex flex-wrap gap-2">
+                                                {FITNESS_GOALS.map(goal => (
+                                                    <button
+                                                        key={goal}
+                                                        type="button"
+                                                        onClick={() => toggleSelection('fitnessGoals', goal)}
+                                                        className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all ${formData.fitnessGoals.includes(goal)
+                                                                ? 'bg-orange-600 text-white shadow-md'
+                                                                : 'bg-white border border-gray-300 text-gray-700 hover:border-orange-400 hover:bg-orange-50'
+                                                            }`}
+                                                    >
+                                                        {goal} {formData.fitnessGoals.includes(goal) && '✓'}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                Dietary Preferences
+                                            </label>
+                                            <div className="flex flex-wrap gap-2">
+                                                {DIETARY_PREFERENCES.map(diet => (
+                                                    <button
+                                                        key={diet}
+                                                        type="button"
+                                                        onClick={() => toggleSelection('dietaryPreferences', diet)}
+                                                        className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all ${formData.dietaryPreferences.includes(diet)
+                                                                ? 'bg-orange-600 text-white shadow-md'
+                                                                : 'bg-white border border-gray-300 text-gray-700 hover:border-orange-400 hover:bg-orange-50'
+                                                            }`}
+                                                    >
+                                                        {diet} {formData.dietaryPreferences.includes(diet) && '✓'}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                Injuries (comma-separated)
                                             </label>
                                             <input
                                                 type="text"
-                                                onChange={(e) => handleArrayInput('fitnessGoals', e.target.value)}
+                                                onChange={(e) => handleArrayInput('injuries', e.target.value)}
                                                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-600 focus:border-transparent"
-                                                placeholder="Weight loss, Build muscle, Improve endurance"
-                                                required
+                                                placeholder="Knee pain, Shoulder injury"
                                             />
                                         </div>
 
@@ -252,15 +425,23 @@ export function RoleSelection() {
 
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                Preferred Workouts (comma-separated)
+                                                Preferred Workouts
                                             </label>
-                                            <input
-                                                type="text"
-                                                onChange={(e) => handleArrayInput('preferredWorkouts', e.target.value)}
-                                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-600 focus:border-transparent"
-                                                placeholder="Cardio, Strength training, Yoga"
-                                                required
-                                            />
+                                            <div className="flex flex-wrap gap-2">
+                                                {WORKOUT_TYPES.map(workout => (
+                                                    <button
+                                                        key={workout}
+                                                        type="button"
+                                                        onClick={() => toggleSelection('preferredWorkouts', workout)}
+                                                        className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all ${formData.preferredWorkouts.includes(workout)
+                                                                ? 'bg-orange-600 text-white shadow-md'
+                                                                : 'bg-white border border-gray-300 text-gray-700 hover:border-orange-400 hover:bg-orange-50'
+                                                            }`}
+                                                    >
+                                                        {workout} {formData.preferredWorkouts.includes(workout) && '✓'}
+                                                    </button>
+                                                ))}
+                                            </div>
                                         </div>
                                     </>
                                 )}

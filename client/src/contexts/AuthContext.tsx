@@ -1,13 +1,40 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import api from '../services/api';
 
-interface User {
+export interface User {
   _id: string;
   email: string;
   name: string;
   role?: string | null;
   avatar?: string;
   profileCompleted?: boolean;
+  trainerId?: string;
+  gymId?: string;
+  phone?: string;
+  bio?: string;
+  age?: number;
+  gender?: string;
+  height?: number;
+  weight?: number;
+  targetWeight?: number;
+  activityLevel?: string;
+  fitnessGoals?: string[];
+  dietaryPreferences?: string[];
+  injuries?: string[];
+  // Gym Owner specific
+  gymName?: string;
+  gymLocation?: string;
+  facilities?: string[];
+  totalMembers?: number;
+  // Trainer specific
+  specializations?: string[];
+  certifications?: string[];
+  yearsOfExperience?: number;
+  sessionPrice?: number;
+  availability?: string;
+  // Common
+  rating?: number;
+  reviews?: any[];
 }
 
 interface AuthContextType {
@@ -16,6 +43,7 @@ interface AuthContextType {
   register: (email: string, password: string, name: string) => Promise<User | null>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
+  updateUser: (user: User) => void;
   isLoading: boolean;
 }
 
@@ -100,6 +128,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         register,
         logout,
         refreshUser,
+        updateUser: setUser,
         isLoading,
       }}
     >

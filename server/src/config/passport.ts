@@ -19,7 +19,7 @@ passport.use(
         {
             clientID: process.env.GOOGLE_CLIENT_ID || '',
             clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
-            callbackURL: 'http://localhost:3001/api/auth/google/callback',
+            callbackURL: process.env.GOOGLE_CALLBACK_URL || (process.env.NODE_ENV === 'production' ? 'https://fitmate-yfrz.onrender.com/api/auth/google/callback' : 'http://localhost:3001/api/auth/google/callback'),
         },
         async (accessToken, refreshToken, profile, done) => {
             try {

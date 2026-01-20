@@ -9,7 +9,7 @@ dotenv.config();
 const seedData = async () => {
     try {
         // Connect to MongoDB
-        const conn = await mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/fitmate');
+        const conn = await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/fitmate');
         console.log(`MongoDB Connected: ${conn.connection.host}`);
 
         // Clear existing users
@@ -84,6 +84,15 @@ const seedData = async () => {
                 fitnessGoals: learner.goals.map(g => g.title),
                 trainerId: learner.trainerId ? idMap[learner.trainerId] : undefined,
                 gymId: learner.gymId ? idMap[learner.gymId] : undefined,
+                // Add new profile fields with mock data
+                age: 25 + Math.floor(Math.random() * 30),
+                gender: Math.random() > 0.5 ? 'male' : 'female',
+                height: 165 + Math.floor(Math.random() * 25),
+                weight: 70 + Math.floor(Math.random() * 30),
+                targetWeight: 65 + Math.floor(Math.random() * 25),
+                activityLevel: 'moderately_active',
+                dietaryPreferences: [],
+                injuries: [],
             });
             createdUsers.push({ role: 'Learner', email: learnerUser.email, password });
         }

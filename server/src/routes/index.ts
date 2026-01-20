@@ -23,8 +23,13 @@ import peerChatRoutes from './peerChatRoutes';
 router.use('/peer-chat', peerChatRoutes);
 
 // Workout Routes
+// Workout Routes
 import workoutRoutes from './workoutRoutes';
 router.use('/workouts', workoutRoutes);
+
+// AI Workout Plan Routes
+import workoutPlanRoutes from './workoutPlanRoutes';
+router.use('/workout-plans', workoutPlanRoutes);
 
 // Dashboard Routes
 router.use('/dashboard', dashboardRoutes);
@@ -34,6 +39,10 @@ router.use('/gyms', gymRoutes);
 
 // Trainer Routes
 router.use('/trainers', trainerRoutes);
+
+// User Routes
+import userRoutes from './userRoutes';
+router.use('/users', userRoutes);
 
 // Seed Routes (for populating database)
 router.use('/', seedRoutes);

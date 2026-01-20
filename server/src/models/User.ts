@@ -36,6 +36,14 @@ export interface IUser extends Document {
     fitnessGoals?: string[];
     experienceLevel?: 'beginner' | 'intermediate' | 'advanced';
     preferredWorkouts?: string[];
+    age?: number;
+    gender?: 'male' | 'female' | 'other' | 'prefer_not_to_say';
+    height?: number;
+    weight?: number;
+    targetWeight?: number;
+    activityLevel?: 'sedentary' | 'lightly_active' | 'moderately_active' | 'very_active' | 'extra_active';
+    dietaryPreferences?: string[];
+    injuries?: string[];
 
     // Trainer-specific fields
     certifications?: string[];
@@ -122,6 +130,17 @@ const UserSchema: Schema = new Schema({
     preferredWorkouts: [{
         type: String,
     }],
+    age: { type: Number },
+    gender: { type: String, enum: ['male', 'female', 'other', 'prefer_not_to_say'] },
+    height: { type: Number }, // in cm
+    weight: { type: Number }, // in kg
+    targetWeight: { type: Number }, // in kg
+    activityLevel: {
+        type: String,
+        enum: ['sedentary', 'lightly_active', 'moderately_active', 'very_active', 'extra_active']
+    },
+    dietaryPreferences: [{ type: String }],
+    injuries: [{ type: String }],
     // Trainer-specific fields
     certifications: [{
         type: String,

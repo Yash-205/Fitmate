@@ -18,6 +18,7 @@ app.use(cors({
             'http://localhost:5173',
             'http://localhost:3000',
             'https://fitmate-blond.vercel.app',
+            'https://fitmate-yfrz.onrender.com',
             process.env.CLIENT_URL || ''
         ].filter(Boolean);
 

@@ -20,7 +20,7 @@ export const getDashboardData = async (req: Request, res: Response) => {
         if (user.role === 'learner') {
             // Fetch Trainer details
             if (user.trainerId) {
-                const trainer = await User.findById(user.trainerId).select('name email avatar specializations');
+                const trainer = await User.findById(user.trainerId).select('name email avatar specializations certifications');
                 console.log('Trainer found:', trainer);
                 dashboardData.trainer = trainer;
             } else {
@@ -28,7 +28,7 @@ export const getDashboardData = async (req: Request, res: Response) => {
             }
             // Fetch Gym details
             if (user.gymId) {
-                const gym = await User.findById(user.gymId).select('name email avatar gymName gymLocation facilities');
+                const gym = await User.findById(user.gymId).select('name email avatar gymName gymLocation facilities totalMembers');
                 console.log('Gym found:', gym);
                 dashboardData.gym = gym;
             } else {

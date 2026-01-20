@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
-
+import dns from "dns";
+dns.setDefaultResultOrder("ipv4first");
 export const connectDB = async () => {
     try {
         if (mongoose.connection.readyState >= 1) {

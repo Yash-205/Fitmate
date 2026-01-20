@@ -15,6 +15,14 @@ export const updateUserRole = async (req: Request, res: Response) => {
             fitnessGoals,
             experienceLevel,
             preferredWorkouts,
+            age,
+            gender,
+            height,
+            weight,
+            targetWeight,
+            activityLevel,
+            dietaryPreferences,
+            injuries,
             // Trainer fields
             certifications,
             specializations,
@@ -48,6 +56,14 @@ export const updateUserRole = async (req: Request, res: Response) => {
             user.fitnessGoals = fitnessGoals;
             user.experienceLevel = experienceLevel;
             user.preferredWorkouts = preferredWorkouts;
+            user.age = age;
+            user.gender = gender;
+            user.height = height;
+            user.weight = weight;
+            user.targetWeight = targetWeight;
+            user.activityLevel = activityLevel;
+            user.dietaryPreferences = dietaryPreferences;
+            user.injuries = injuries;
         } else if (role === 'trainer') {
             user.certifications = certifications;
             user.specializations = specializations;
@@ -69,8 +85,19 @@ export const updateUserRole = async (req: Request, res: Response) => {
             phone: user.phone,
             bio: user.bio,
             profileCompleted: user.profileCompleted,
+            trainerId: user.trainerId,
+            gymId: user.gymId,
             // Include role-specific fields in response
             ...(role === 'learner' && {
+                dateOfBirth: user.age, // Mapping age back if needed or just return age
+                age: user.age,
+                gender: user.gender,
+                height: user.height,
+                weight: user.weight,
+                targetWeight: user.targetWeight,
+                activityLevel: user.activityLevel,
+                dietaryPreferences: user.dietaryPreferences,
+                injuries: user.injuries,
                 fitnessGoals: user.fitnessGoals,
                 experienceLevel: user.experienceLevel,
                 preferredWorkouts: user.preferredWorkouts,
@@ -86,6 +113,48 @@ export const updateUserRole = async (req: Request, res: Response) => {
                 facilities: user.facilities,
             }),
         });
+    } catch (error) {
+        res.status(500).json({ message: (error as Error).message });
+    }
+};
+
+// @desc    Update user profile (generic)
+// @route   PUT /api/users/profile
+// @access  Private
+export const updateUserProfile = async (req: Request, res: Response) => {
+    try {
+        const user = req.user as IUser;
+        const updates = req.body;
+
+        if (!user) {
+            res.status(404).json({ message: 'User not found' });
+            return;
+        }
+
+        // Allow updating allowed fields
+        const allowedUpdates = [
+            'name', 'phone', 'bio',
+            'age', 'gender', 'height', 'weight', 'targetWeight', 'activityLevel',
+            'fitnessGoals', 'dietaryPreferences', 'injuries',
+            'experienceLevel', 'preferredWorkouts',
+            'gymName', 'gymLocation', 'facilities', // specific fields
+            'certifications', 'specializations', 'yearsOfExperience', 'sessionPrice'
+        ];
+
+        Object.keys(updates).forEach((update) => {
+            if (allowedUpdates.includes(update)) {
+                (user as any)[update] = updates[update];
+            }
+        });
+
+        // Ensure profile is marked completed if it wasn't
+        if (!user.profileCompleted) {
+            user.profileCompleted = true;
+        }
+
+        await user.save();
+
+        res.json(user);
     } catch (error) {
         res.status(500).json({ message: (error as Error).message });
     }
